@@ -10,6 +10,8 @@ import {
 
 const router = express.Router();
 
-router.route("/").post(nuevaCaja).put(editarCaja).get(obtenerCaja);
+router.route("/").post(nuevaCaja);
+
+router.route("/:id").put(editarCaja).get(obtenerCaja);
 
 export default router;

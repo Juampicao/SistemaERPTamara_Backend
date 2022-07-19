@@ -13,21 +13,18 @@ const nuevaCaja = async (req, res) => {
 };
 
 const editarCaja = async (req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  // const { id } = req.params;
-  const { _id } = req.params;
+  // res.setHeader("Access-Control-Allow-Origin", "*");
+  const { id } = req.params;
   const caja = await Caja.findById(id);
-  // const caja = await Caja.findOne((Caja._id = "62cf04d320fdec269473e073"));
-  // const caja = await Caja.find();
 
   console.log(caja);
   if (!caja) {
-    const error = new Error("No Encontrado");
+    const error = new Error("Caja no encontrada.");
     return res.status(404).json({ msg: error.message });
   }
 
-  caja.nombre = req.body.nombre || proyecto.nombre;
-  caja.inicioCaja = req.body.inicioCaja || proyecto.inicioCaja;
+  caja.nombre = req.body.nombre || caja.nombre;
+  caja.inicioCaja = req.body.inicioCaja || caja.inicioCaja;
 
   try {
     const cajaAlmacenado = await caja.save();

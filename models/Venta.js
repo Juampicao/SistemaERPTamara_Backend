@@ -1,15 +1,30 @@
 import mongoose from "mongoose";
 import { DiaActual } from "../helpers/funciones.js";
 
-const gastosSchema = mongoose.Schema(
+const ventasSchema = mongoose.Schema(
   {
-    nombre: {
+    producto: {
       type: String,
       trim: true,
       required: true,
     },
-    valor: {
+    cantidad: {
       type: Number,
+      trim: true,
+      required: true,
+    },
+    valorIndividual: {
+      type: Number,
+      trim: true,
+      required: true,
+    },
+    valorTotal: {
+      type: Number,
+      trim: true,
+      required: true,
+    },
+    metodoPago: {
+      type: String,
       trim: true,
       required: true,
     },
@@ -32,23 +47,11 @@ const gastosSchema = mongoose.Schema(
     //   type: mongoose.Schema.Types.ObjectId,
     //   ref: "Usuario",
     // },
-    // tareas: [
-    //   {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: "Tarea",
-    //   },
-    // ],
-    // colaboradores: [
-    //   {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: "Usuario",
-    //   },
-    // ],
   },
   {
     timestamps: true,
   }
 );
 
-const Gasto = mongoose.model("Gasto", gastosSchema);
-export default Gasto;
+const Venta = mongoose.model("Venta", ventasSchema);
+export default Venta;

@@ -59,6 +59,7 @@ const editarGasto = async (req, res) => {
   gasto.valor = req.body.valor || gasto.valor;
   gasto.categoria = req.body.categoria || gasto.categoria;
   gasto.fecha = req.body.fecha || gasto.fecha;
+  gasto.notas = req.body.notas || gasto.notas;
 
   try {
     const gastoAlmacenado = await gasto.save();
