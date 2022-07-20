@@ -1,16 +1,41 @@
 import Venta from "../models/Venta.js";
 import Usuario from "../models/Usuario.js";
+import Producto from "../models/Producto.js";
+import { crearArrayValores, sumarNumerosArray } from "../helpers/funciones.js";
 
 // Traer todos los gastos. Postman /gastos.
 const obtenerVentas = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   // Solo los que creo el usuario
-  const ventas = await Venta.find().where("creador").equals(req.usuario);
-  res.json(ventas);
+  const arrayTotalVentas = await Venta.find()
+    .where("creador")
+    .equals(req.usuario);
 
-  // Todos los gastos creados por cualquiera
-  // const gasto = await Gasto.find();
-  // res.json(gasto);
+  // 1) Creando arrays por categoira.
+  const arrayVentasEfectivo = await Venta.find()
+    .where("metodoPago")
+    .equals("Efectivo");
+  // console.log(arrayVentasEfectivo);
+
+  // 2) Creo arrayValores
+  let arrayVentasEfectivoValores = [];
+  function crearArrayValores(oldArr, newArr) {
+    for (let i = 0; i < oldArr.length; i++) {
+      let result = oldArr[i].valorTotal;
+      newArr.push(result);
+    }
+  }
+  crearArrayValores(arrayVentasEfectivo, arrayVentasEfectivoValores);
+  console.log(arrayVentasEfectivoValores);
+
+  // 3) sumo los valores
+  let montoTotalVentasEfectivo = sumarNumerosArray(arrayVentasEfectivoValores);
+  console.log(montoTotalVentasEfectivo);
+  res.json({
+    arrayTotalVentas,
+    arrayVentasEfectivo,
+    montoTotalVentasEfectivo,
+  });
 };
 
 const nuevaVenta = async (req, res) => {
@@ -19,6 +44,7 @@ const nuevaVenta = async (req, res) => {
   // gasto.creador = req.usuario._id;
   try {
     const ventAlmacenada = await venta.save();
+
     console.log(ventAlmacenada);
     console.log("Venta creada con exito");
     res.json(ventAlmacenada);

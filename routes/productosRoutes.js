@@ -5,7 +5,6 @@ import {
   obtenerProductos,
   eliminarProducto,
   editarProducto,
-  editarCantidadProducto,
   nuevoProducto,
 } from "../controllers/productosController.js";
 
@@ -21,5 +20,4 @@ router
   .put(editarProducto)
   .delete(eliminarProducto);
 
-router.route("editarcantidad/:id").put(editarCantidadProducto);
 export default router;

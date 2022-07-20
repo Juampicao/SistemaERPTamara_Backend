@@ -6,7 +6,69 @@ const obtenerGastos = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   // Solo los que creo el usuario
   const gastos = await Gasto.find().where("creador").equals(req.usuario);
-  res.json(gastos);
+  console.log(gastos);
+
+  // Creando arrays por categoira.
+  const arrayGastosComida = await Gasto.find()
+    .where("categoria")
+    .equals("Comida");
+  // console.log(arrayGastosComida);
+
+  const arrayGastosVarios = await Gasto.find()
+    .where("categoria")
+    .equals("Gastos");
+  // console.log(arrayGastosVarios);
+
+  const arrayGastosProveedor = await Gasto.find()
+    .where("categoria")
+    .equals("Proveedor");
+  // console.log(arrayGastosProveedor);
+
+  // Creando Arrays solo del valor.
+  let arrayGastosComidaValores = [];
+  let arrayGastosVariosValores = [];
+  let arrayGastosProveedorValores = [];
+  function crearArrayValores(oldArr, newArr) {
+    for (let i = 0; i < oldArr.length; i++) {
+      let result = oldArr[i].valor;
+      newArr.push(result);
+    }
+  }
+  crearArrayValores(arrayGastosComida, arrayGastosComidaValores);
+  crearArrayValores(arrayGastosVarios, arrayGastosVariosValores);
+  crearArrayValores(arrayGastosProveedor, arrayGastosProveedorValores);
+
+  // 3) Sumo los valores
+  function sumarNumerosArray(arr) {
+    let resultado;
+    if (arr.length > 0) {
+      const reducer = (accumulator, curr) => accumulator + curr;
+      resultado = arr.reduce(reducer);
+    } else {
+      resultado = 0;
+    }
+    return resultado;
+  }
+  let montoTotalGastosComida = sumarNumerosArray(arrayGastosComidaValores);
+  let montoTotalGastosVarios = sumarNumerosArray(arrayGastosVariosValores);
+  let montoTotalGastosProveedores = sumarNumerosArray(
+    arrayGastosProveedorValores
+  );
+  // let montoTotalGastos =
+  //   arrayGastosComidaValores +
+  //   arrayGastosVariosValores +
+  //   arrayGastosProveedorValores;
+
+  res.json({
+    gastos,
+    arrayGastosComida,
+    arrayGastosVarios,
+    arrayGastosProveedor,
+    montoTotalGastosComida,
+    montoTotalGastosVarios,
+    montoTotalGastosProveedores,
+    // montoTotalGastos,
+  });
 
   // Todos los gastos creados por cualquiera
   // const gasto = await Gasto.find();
@@ -90,9 +152,59 @@ const eliminarGasto = async (req, res) => {
   }
 };
 
-// const agregarColaborador = async (req, res) => {};
+const crearArraysValoresDeGastos = async (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
 
-// const eliminarColaborador = async (req, res) => {};
+  const arrayGastosComida = await Gasto.find()
+    .where("categoria")
+    .equals("Comida");
+  // res.json(arrayGastosComida);
+  console.log(arrayGastosComida);
+  // --- Funcion arrays nuevos y sumas dinamicas -----//
+  // let arrayGastosComida = [];
+  // let arrayGastosVarios = [];
+  // let arrayGastosProveedor = [];
+
+  // function crearArraysGastosSegmentados() {
+  //   for (let i = 0; i < gastos.length; i++) {
+  //     if (gastos[i].categoria === "Comida") {
+  //       arrayGastosComida.push(gastos[i]);
+  //     }
+  //     if (gastos[i].categoria === "Gastos") {
+  //       arrayGastosVarios.push(gastos[i]);
+  //     }
+  //     if (gastos[i].categoria === "Proveedor") {
+  //       arrayGastosProveedor.push(gastos[i]);
+  //     }
+  //   }
+  // }
+  // crearArraysGastosSegmentados();
+  // // console.log(arrayGastosComida, arrayGastosVarios, arrayGastosProveedor);
+
+  // // 2) Crear Array con los valores de gastosComida.
+  // let arrayGastosComidaValores = [];
+  // let arrayGastosVariosValores = [];
+  // let arrayGastosProveedorValores = [];
+  // function crearArrayValores(oldArr, newArr) {
+  //   for (let i = 0; i < oldArr.length; i++) {
+  //     let result = oldArr[i].valor;
+  //     newArr.push(result);
+  //     // console.log(newArr);
+  //   }
+  // }
+  // crearArrayValores(arrayGastosComida, arrayGastosComidaValores);
+  // crearArrayValores(arrayGastosVarios, arrayGastosVariosValores);
+  // crearArrayValores(arrayGastosProveedor, arrayGastosProveedorValores);
+
+  // // 3) Funcion suma de arrays, dinamico.
+  // function sumarNumerosArray(arr) {
+  //   // arr && arr.length ? arr : [0, 0];
+  //   const reducer = (accumulator, curr) => accumulator + curr;
+  //   let resultado = arr.reduce(reducer);
+  //   // console.log(resultado);
+  //   return resultado;
+  // }
+};
 
 export {
   obtenerGastos,
@@ -100,6 +212,5 @@ export {
   obtenerGasto,
   editarGasto,
   eliminarGasto,
-  //   eliminarProyecto,
-  //   agregarColaborador,
+  crearArraysValoresDeGastos,
 };

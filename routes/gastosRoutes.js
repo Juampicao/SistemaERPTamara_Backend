@@ -6,13 +6,17 @@ import {
   obtenerGasto,
   editarGasto,
   eliminarGasto,
+  crearArraysValoresDeGastos,
 } from "../controllers/gastosController.js";
 
 import checkAuth from "../middleware/checkAuth.js";
 
 const router = express.Router();
 
-router.route(`/`).get(obtenerGastos).post(nuevoGasto);
+router
+  .route(`/`)
+  .get(obtenerGastos, crearArraysValoresDeGastos)
+  .post(nuevoGasto);
 
 router.route("/:id").get(obtenerGasto).put(editarGasto).delete(eliminarGasto);
 //   .delete(checkAuth, eliminarProyecto);
