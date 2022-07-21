@@ -41,7 +41,7 @@ const obtenerVentas = async (req, res) => {
 const nuevaVenta = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   const venta = new Venta(req.body);
-  // gasto.creador = req.usuario._id;
+
   try {
     const ventAlmacenada = await venta.save();
 
@@ -57,8 +57,9 @@ const nuevaVenta = async (req, res) => {
 const obtenerVenta = async (req, res) => {
   const { id } = req.params;
   console.log(id);
-  const venta = await Venta.findById(id);
+  const venta = await Venta.findById(id).populate("productoVendido");
   res.json(venta);
+  console.log(venta);
 
   // if (!gasto) {
   //   const error = new Error("No Encontrado");

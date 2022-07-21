@@ -42,11 +42,11 @@ const ventasSchema = mongoose.Schema(
       trim: true,
       required: false,
     },
-    // ,
-    // creador: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "Usuario",
-    // },
+
+    productoVendido: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Producto",
+    },
   },
   {
     timestamps: true,

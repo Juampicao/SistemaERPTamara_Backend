@@ -14,7 +14,6 @@ app.use(express.json());
 dotenv.config();
 
 conectarDB();
-
 // const whitelist = [`http://localhost:3000`];
 
 // Configurar CORS

@@ -17,5 +17,19 @@ Instalaciones:
 
 
 
+<!-- Listado Gastos -->
+import IconoProveedor from "../../../img/IconoProveedor.png";
+import IconoGastosVarios from "../../../img/IconoGastosVarios.png";
+import IconoComida from "../../../img/IconoComida.png";
 
+Descomentar diccionario
+Descomentar las imagenes. 
+
+<!-- Gasto -->
+import IconoProveedor from "../../../img/IconoProveedor.png";
+import IconoGastosVarios from "../../../img/IconoGastosVarios.png";
+import IconoComida from "../../../img/IconoComida.png";
+
+Descoemntario diccionario
+Descomentario Imagenes.
 
