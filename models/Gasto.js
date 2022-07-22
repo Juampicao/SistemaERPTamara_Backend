@@ -27,6 +27,10 @@ const gastosSchema = mongoose.Schema(
       trim: true,
       required: false,
     },
+    productoIngresado: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Producto",
+    },
     // ,
     // creador: {
     //   type: mongoose.Schema.Types.ObjectId,

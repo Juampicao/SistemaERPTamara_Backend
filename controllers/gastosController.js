@@ -24,10 +24,17 @@ const obtenerGastos = async (req, res) => {
     .equals("Proveedor");
   // console.log(arrayGastosProveedor);
 
+  const arrayGastosInventario = await Gasto.find()
+    .where("categoria")
+    .equals("Inventario");
+  console.log(arrayGastosInventario);
+
   // Creando Arrays solo del valor.
   let arrayGastosComidaValores = [];
   let arrayGastosVariosValores = [];
   let arrayGastosProveedorValores = [];
+  let arrayGastosInventarioValores = [];
+
   function crearArrayValores(oldArr, newArr) {
     for (let i = 0; i < oldArr.length; i++) {
       let result = oldArr[i].valor;
@@ -37,6 +44,7 @@ const obtenerGastos = async (req, res) => {
   crearArrayValores(arrayGastosComida, arrayGastosComidaValores);
   crearArrayValores(arrayGastosVarios, arrayGastosVariosValores);
   crearArrayValores(arrayGastosProveedor, arrayGastosProveedorValores);
+  crearArrayValores(arrayGastosInventario, arrayGastosInventarioValores);
 
   // 3) Sumo los valores
   function sumarNumerosArray(arr) {
@@ -54,20 +62,27 @@ const obtenerGastos = async (req, res) => {
   let montoTotalGastosProveedores = sumarNumerosArray(
     arrayGastosProveedorValores
   );
-  // let montoTotalGastos =
-  //   arrayGastosComidaValores +
-  //   arrayGastosVariosValores +
-  //   arrayGastosProveedorValores;
+  let montoTotalGastosInventario = sumarNumerosArray(
+    arrayGastosInventarioValores
+  );
+
+  let montoTotalGastos =
+    arrayGastosComidaValores +
+    arrayGastosVariosValores +
+    arrayGastosProveedorValores +
+    arrayGastosInventarioValores;
 
   res.json({
     gastos,
     arrayGastosComida,
     arrayGastosVarios,
     arrayGastosProveedor,
+    arrayGastosInventario,
     montoTotalGastosComida,
     montoTotalGastosVarios,
     montoTotalGastosProveedores,
-    // montoTotalGastos,
+    montoTotalGastosInventario,
+    montoTotalGastos,
   });
 
   // Todos los gastos creados por cualquiera
@@ -92,7 +107,7 @@ const nuevoGasto = async (req, res) => {
 const obtenerGasto = async (req, res) => {
   const { id } = req.params;
   console.log(id);
-  const gasto = await Gasto.findById(id);
+  const gasto = await Gasto.findById(id).populate("productoVendido");
   res.json(gasto);
 
   // if (!gasto) {
