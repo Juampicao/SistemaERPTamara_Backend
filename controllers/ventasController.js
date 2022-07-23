@@ -57,7 +57,8 @@ const nuevaVenta = async (req, res) => {
 const obtenerVenta = async (req, res) => {
   const { id } = req.params;
   console.log(id);
-  const venta = await Venta.findById(id).populate("productoVendido");
+  const venta = await Venta.findById(id);
+  // .populate("productoVendido");
   res.json(venta);
   console.log(venta);
 

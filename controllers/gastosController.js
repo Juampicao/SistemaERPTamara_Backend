@@ -107,7 +107,8 @@ const nuevoGasto = async (req, res) => {
 const obtenerGasto = async (req, res) => {
   const { id } = req.params;
   console.log(id);
-  const gasto = await Gasto.findById(id).populate("productoVendido");
+  const gasto = await Gasto.findById(id);
+  // .populate("productoVendido");
   res.json(gasto);
 
   // if (!gasto) {
