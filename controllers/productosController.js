@@ -25,13 +25,6 @@ const nuevoProducto = async (req, res) => {
 const obtenerProducto = async (req, res) => {
   const { id } = req.params;
   console.log(id);
-  const producto = await Producto.findById(id);
-  res.json(producto);
-
-  if (!producto) {
-    const error = new Error("No Encontrado");
-    return res.status(404).json({ msg: error.message });
-  }
 
   // {
   //   const error = new Error("Acción No Válida");

@@ -1,36 +1,42 @@
 import mongoose from "mongoose";
-import { FechaHoyArgentina } from "../helpers/funciones.js";
 
-const productoSchema = mongoose.Schema(
+const pruebaSchema = mongoose.Schema(
   {
-    nombreProducto: {
+    nombre: {
       type: String,
       trim: true,
       required: true,
+    },
+    productoComprado: {
+      type: String,
+      trim: true,
+      required: false,
+    },
+    unidadesVendidas: {
+      type: Number,
+      trim: true,
+      // required: true,
     },
     cantidad: {
       type: Number,
       trim: true,
-      required: true,
+      required: false,
     },
     precio: {
       type: Number,
       trim: true,
-      required: true,
+      // required: true,
     },
     costo: {
       type: Number,
       trim: true,
-      required: true,
+      // required: true,
     },
+
     categoria: {
       type: String,
       trim: true,
-      required: true,
-    },
-    fecha: {
-      type: Date,
-      default: FechaHoyArgentina,
+      // required: true,
     },
     descripcion: {
       type: String,
@@ -43,5 +49,5 @@ const productoSchema = mongoose.Schema(
   }
 );
 
-const Producto = mongoose.model("Producto", productoSchema);
-export default Producto;
+const Prueba = mongoose.model("Prueba", pruebaSchema);
+export default Prueba;

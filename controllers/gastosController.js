@@ -5,8 +5,24 @@ import Usuario from "../models/Usuario.js";
 const obtenerGastos = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   // Solo los que creo el usuario
+  res.setHeader("Access-Control-Allow-Origin", "*");
+
+  const obtenerValoresUnicos = await Gasto.aggregate([
+    { $match: {} },
+    {
+      $group: {
+        _id: "$categoria",
+        valor: { $sum: "$valor" },
+      },
+    },
+  ]); // Suma de cada categoria.
+  console.log(obtenerValoresUnicos);
+
+  // const obtenerTotalGastosUnicos = await Gasto.find().where("valor").equals(9); 
+  // console.log(obtenerTotalGastosUnicos)
+
   const gastos = await Gasto.find().where("creador").equals(req.usuario);
-  console.log(gastos);
+  // console.log(gastos);
 
   // Creando arrays por categoira.
   const arrayGastosComida = await Gasto.find()
@@ -27,7 +43,7 @@ const obtenerGastos = async (req, res) => {
   const arrayGastosInventario = await Gasto.find()
     .where("categoria")
     .equals("Inventario");
-  console.log(arrayGastosInventario);
+  // console.log(arrayGastosInventario);
 
   // Creando Arrays solo del valor.
   let arrayGastosComidaValores = [];
@@ -83,6 +99,7 @@ const obtenerGastos = async (req, res) => {
     montoTotalGastosProveedores,
     montoTotalGastosInventario,
     montoTotalGastos,
+    obtenerValoresUnicos,
   });
 
   // Todos los gastos creados por cualquiera
@@ -107,8 +124,9 @@ const nuevoGasto = async (req, res) => {
 const obtenerGasto = async (req, res) => {
   const { id } = req.params;
   console.log(id);
-  const gasto = await Gasto.findById(id).populate("productoVendido");
-  res.json(gasto);
+  const gasto = await Gasto.findById(id)
+    // populate("productoVendido");
+    .res.json(gasto);
 
   // if (!gasto) {
   //   const error = new Error("No Encontrado");
@@ -221,6 +239,21 @@ const crearArraysValoresDeGastos = async (req, res) => {
   // }
 };
 
+const obtenerEstadisticas = async (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+
+  const obtenerValoresUnicos = await Gasto.aggregate([
+    { $match: {} },
+    {
+      $group: {
+        _id: "$categoria",
+        valor: { $sum: "$valor" },
+      },
+    },
+  ]); // 9 . ${Match} => Excluir o solo seleccionar algunas propiedades. ${Group}, iterar sobre estas categorias.
+  console.log("ESTA ACA REY");
+  console.log(obtenerValoresUnicos);
+};
 export {
   obtenerGastos,
   nuevoGasto,
@@ -228,4 +261,5 @@ export {
   editarGasto,
   eliminarGasto,
   crearArraysValoresDeGastos,
+  obtenerEstadisticas,
 };

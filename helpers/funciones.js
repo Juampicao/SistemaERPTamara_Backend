@@ -10,9 +10,10 @@ export const formatearFecha = (fecha) => {
   return fechaNueva.toLocaleDateString("es-ES", opciones);
 };
 
-// export default formatearFecha(DiaActual);
-let DiaHoy = new Date();
-export let DiaActual = DiaHoy.toISOString().substring(0, 10);
+let date = new Date();
+export let FechaHoyArgentina = date
+  .toLocaleString("en-US", "America/Argentina/Buenos_Aires")
+  .slice(0, 9);
 
 // Paso 1 Crear Array.
 export function crearArrayValores(oldArr, newArr) {
@@ -34,10 +35,9 @@ export function sumarNumerosArray(arr) {
   return resultado;
 }
 
-console.log(DiaActual);
 export default {
-  DiaActual,
   formatearFecha,
   crearArrayValores,
   sumarNumerosArray,
+  FechaHoyArgentina,
 };
