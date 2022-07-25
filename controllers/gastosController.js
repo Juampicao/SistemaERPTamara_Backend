@@ -18,7 +18,7 @@ const obtenerGastos = async (req, res) => {
   ]); // Suma de cada categoria.
   console.log(obtenerValoresUnicos);
 
-  // const obtenerTotalGastosUnicos = await Gasto.find().where("valor").equals(9); 
+  // const obtenerTotalGastosUnicos = await Gasto.find().where("valor").equals(9);
   // console.log(obtenerTotalGastosUnicos)
 
   const gastos = await Gasto.find().where("creador").equals(req.usuario);
@@ -124,9 +124,9 @@ const nuevoGasto = async (req, res) => {
 const obtenerGasto = async (req, res) => {
   const { id } = req.params;
   console.log(id);
-  const gasto = await Gasto.findById(id)
-    // populate("productoVendido");
-    .res.json(gasto);
+  const gasto = await Gasto.findById(id);
+  // .populate("productoVendido");
+  res.json(gasto);
 
   // if (!gasto) {
   //   const error = new Error("No Encontrado");
