@@ -50,7 +50,7 @@ app.use(`/caja`, cajaRoutes);
 const PORT = process.env.PORT || 4000;
 
 app.listen(PORT, () => {
-  console.log("Servidor Corriendo en el puerto 4000");
+  console.log("Servidor Corriendo en puerto 4000");
 });
 
 // Seccion Pruebas
@@ -133,3 +133,4 @@ app.listen(PORT, () => {
 // ]); // 9 . ${Match} => Excluir o solo seleccionar algunas propiedades. ${Group}, iterar sobre estas categorias.
 // console.log(prueba);
 // }
+//
