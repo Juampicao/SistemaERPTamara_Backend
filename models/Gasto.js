@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { DiaActual } from "../helpers/funciones.js";
+import { FechaHoyArgentina } from "../helpers/funciones.js";
 
 const gastosSchema = mongoose.Schema(
   {
@@ -20,7 +20,7 @@ const gastosSchema = mongoose.Schema(
     },
     fecha: {
       type: Date,
-      default: DiaActual,
+      default: FechaHoyArgentina,
     },
     notas: {
       type: String,

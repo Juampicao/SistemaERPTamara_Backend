@@ -20,7 +20,6 @@ const nuevoProducto = async (req, res) => {
     console.log(error);
   }
 };
-
 // producto individual. Escribir ID.
 const obtenerProducto = async (req, res) => {
   const { id } = req.params;
@@ -39,7 +38,6 @@ const obtenerProducto = async (req, res) => {
   // }
   // res.json(producto);
 };
-
 // Si cambio solo uno, lo demas sigue igual. Solo edita quien lo creo.
 const editarProducto = async (req, res) => {
   const { id } = req.params;
