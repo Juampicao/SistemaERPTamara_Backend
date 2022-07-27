@@ -6,13 +6,14 @@ import {
   eliminarProducto,
   editarProducto,
   nuevoProducto,
+  obtenerEstadisticas,
 } from "../controllers/productosController.js";
 
 import checkAuth from "../middleware/checkAuth.js";
 
 const router = express.Router();
 
-router.route(`/`).get(obtenerProductos).post(nuevoProducto);
+router.route(`/`).get(obtenerProductos,obtenerEstadisticas).post(nuevoProducto);
 
 router
   .route("/:id")

@@ -1,5 +1,6 @@
 import Producto from "../models/Producto.js";
 import Usuario from "../models/Usuario.js";
+import Venta from "../models/Venta.js";
 
 // Traer todos los productos. Postman /productos.
 const obtenerProductos = async (req, res) => {
@@ -20,6 +21,8 @@ const nuevoProducto = async (req, res) => {
     console.log(error);
   }
 };
+
+
 // producto individual. Escribir ID.
 const obtenerProducto = async (req, res) => {
   const { id } = req.params;
@@ -112,6 +115,23 @@ const eliminarProducto = async (req, res) => {
   }
 };
 
+
+const obtenerEstadisticas = async (req, res) => {
+  // res.setHeader("Access-Control-Allow-Origin", "*");
+ 
+  const productosUnicos = await Producto.count(); 
+
+  const productoMayorPrecio = await   Producto.find().sort({precio:-1}).limit(1) 
+
+  const productoMayorCantidad = await Producto.find().sort({cantidad:-1}).limit(1) 
+  
+  
+  // res.json(productosUnicos);
+
+  console.log(productosUnicos,productoMayorPrecio, productoMayorCantidad)
+};
+
+
 export {
   obtenerProducto,
   obtenerProductos,
@@ -119,6 +139,7 @@ export {
   editarProducto,
   nuevoProducto,
   editarStock,
+  obtenerEstadisticas,
 };
 
 // switch (req.body.accionstock) {
