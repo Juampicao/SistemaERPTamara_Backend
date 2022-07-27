@@ -16,7 +16,7 @@ const router = express.Router();
 
 router
   .route(`/`)
-  .get(obtenerGastos, crearArraysValoresDeGastos, obtenerEstadisticas)
+  .get(obtenerGastos, crearArraysValoresDeGastos)
   .post(nuevoGasto);
 
 router.route("/:id").get(obtenerGasto).put(editarGasto).delete(eliminarGasto);
