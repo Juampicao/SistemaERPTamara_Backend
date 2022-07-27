@@ -3,7 +3,7 @@ import Usuario from "../models/Usuario.js";
 import Producto from "../models/Producto.js";
 import { crearArrayValores, sumarNumerosArray } from "../helpers/funciones.js";
 
-// Traer todos los gastos. Postman /gastos.
+
 const obtenerVentas = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   // Solo los que creo el usuario
@@ -31,6 +31,8 @@ const obtenerVentas = async (req, res) => {
   // 3) sumo los valores
   let montoTotalVentasEfectivo = sumarNumerosArray(arrayVentasEfectivoValores);
   console.log(montoTotalVentasEfectivo);
+
+  //4 Respuesta Json
   res.json({
     arrayTotalVentas,
     arrayVentasEfectivo,
@@ -122,4 +124,31 @@ const eliminarVenta = async (req, res) => {
   }
 };
 
-export { obtenerVentas, nuevaVenta, obtenerVenta, editarVenta, eliminarVenta };
+const obtenerEstadisticasVenta = async (req, res) => {
+
+  const cantidadVendidaPorProducto = await Venta.aggregate([
+    { $match: {} },
+    { $group: { _id: "$producto", valorIndividual: { $sum: "$valorTotal" } } },
+  ]);
+  
+
+  const ventasUnicas = await Venta.count();
+
+  const cantidadesVendidas = await Venta.aggregate([
+      {
+        $group:
+          { _id: "$producto", cantidad: { $sum: 1 } }
+      },
+  ]);
+  
+    const valorTotal = await Venta.aggregate([
+      {
+        $group:
+          { _id: "$producto", valorIndividual: { $sum: "valorIndividual" } }
+      },
+    ]);
+  
+  console.log(cantidadVendidaPorProducto, ventasUnicas, cantidadesVendidas, valorTotal)
+}
+
+export { obtenerVentas, nuevaVenta, obtenerVenta, editarVenta, eliminarVenta,obtenerEstadisticasVenta };

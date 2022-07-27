@@ -21,6 +21,8 @@ const nuevoProducto = async (req, res) => {
     console.log(error);
   }
 };
+
+
 // producto individual. Escribir ID.
 const obtenerProducto = async (req, res) => {
   const { id } = req.params;
