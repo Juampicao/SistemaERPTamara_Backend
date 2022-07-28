@@ -26,11 +26,12 @@ const obtenerVentas = async (req, res) => {
     }
   }
   crearArrayValores(arrayVentasEfectivo, arrayVentasEfectivoValores);
-  console.log(arrayVentasEfectivoValores);
+  // console.log(arrayVentasEfectivoValores);
 
   // 3) sumo los valores
   let montoTotalVentasEfectivo = sumarNumerosArray(arrayVentasEfectivoValores);
-  console.log(montoTotalVentasEfectivo);
+  // console.log(montoTotalVentasEfectivo);
+
 
   //4 Respuesta Json
   res.json({
@@ -47,7 +48,7 @@ const nuevaVenta = async (req, res) => {
   try {
     const ventAlmacenada = await venta.save();
 
-    console.log(ventAlmacenada);
+    // console.log(ventAlmacenada);
     console.log("Venta creada con exito");
     res.json(ventAlmacenada);
   } catch (error) {
@@ -131,7 +132,6 @@ const obtenerEstadisticasVenta = async (req, res) => {
     { $group: { _id: "$producto", valorIndividual: { $sum: "$valorTotal" } } },
   ]);
   
-
   const ventasUnicas = await Venta.count();
 
   const cantidadesVendidas = await Venta.aggregate([
@@ -141,14 +141,10 @@ const obtenerEstadisticasVenta = async (req, res) => {
       },
   ]);
   
-    const valorTotal = await Venta.aggregate([
-      {
-        $group:
-          { _id: "$producto", valorIndividual: { $sum: "valorIndividual" } }
-      },
-    ]);
-  
-  console.log(cantidadVendidaPorProducto, ventasUnicas, cantidadesVendidas, valorTotal)
+
+  console.log("ventas")
+  // console.log(cantidadVendidaPorProducto, ventasUnicas, cantidadesVendidas)
+  res.json({cantidadVendidaPorProducto, ventasUnicas, cantidadesVendidas})
 }
 
 export { obtenerVentas, nuevaVenta, obtenerVenta, editarVenta, eliminarVenta,obtenerEstadisticasVenta };

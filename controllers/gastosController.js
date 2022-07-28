@@ -16,7 +16,7 @@ const obtenerGastos = async (req, res) => {
       },
     },
   ]); // Suma de cada categoria.
-  console.log(obtenerValoresUnicos);
+  // console.log(obtenerValoresUnicos);
 
   // const obtenerTotalGastosUnicos = await Gasto.find().where("valor").equals(9);
   // console.log(obtenerTotalGastosUnicos)
@@ -192,7 +192,7 @@ const crearArraysValoresDeGastos = async (req, res) => {
     .where("categoria")
     .equals("Comida");
   // res.json(arrayGastosComida);
-  console.log(arrayGastosComida);
+  // console.log(arrayGastosComida);
   // --- Funcion arrays nuevos y sumas dinamicas -----//
   // let arrayGastosComida = [];
   // let arrayGastosVarios = [];
@@ -252,7 +252,7 @@ const obtenerEstadisticas = async (req, res) => {
     },
   ]); // 9 . ${Match} => Excluir o solo seleccionar algunas propiedades. ${Group}, iterar sobre estas categorias.
   console.log("ESTA ACA REY");
-  console.log(obtenerValoresUnicos);
+  // console.log(obtenerValoresUnicos);
 };
 export {
   obtenerGastos,
