@@ -32,12 +32,23 @@ const obtenerVentas = async (req, res) => {
   let montoTotalVentasEfectivo = sumarNumerosArray(arrayVentasEfectivoValores);
   // console.log(montoTotalVentasEfectivo);
 
+     const montoTotalVentasEfectivoNuevo = await Venta.aggregate([
+    { $match: {} },
+    {
+      $group: {
+        _id: "Valor Total de Ventas",
+        valorTotal: { $sum: "$valorTotal" },
+      },
+    },
+     ]); 
+  // console.log(montoTotalVentasEfectivoNuevo)
 
   //4 Respuesta Json
   res.json({
     arrayTotalVentas,
     arrayVentasEfectivo,
     montoTotalVentasEfectivo,
+    montoTotalVentasEfectivoNuevo,
   });
 };
 
@@ -64,17 +75,6 @@ const obtenerVenta = async (req, res) => {
   // .populate("productoVendido");
   res.json(venta);
   console.log(venta);
-
-  // if (!gasto) {
-  //   const error = new Error("No Encontrado");
-  //   return res.status(404).json({ msg: error.message });
-  // }
-
-  // {
-  //   const error = new Error("Acción No Válida");
-  //   return res.status(401).json({ msg: error.message });
-  // }
-  // res.json(gasto);
 };
 
 // Si cambio solo uno, lo demas sigue igual. Solo edita quien lo creo.

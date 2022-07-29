@@ -8,10 +8,13 @@ import cajaRoutes from "./routes/cajaRoutes.js";
 import ventasRoutes from "./routes/ventasRoutes.js";
 import productosRoutes from "./routes/productosRoutes.js";
 import pruebasRoutes from "./routes/pruebasRoutes.js";
+import estadisticasRoutes from "./routes/estadisticasRoutes.js";
+
 import Prueba from "./models/Prueba.js";
 import Venta from "./models/Venta.js";
 import { obtenerEstadisticas } from "./controllers/productosController.js";
 import { obtenerEstadisticasVenta, obtenerVentas } from "./controllers/ventasController.js";
+import { obtenerEstadisticasGastos, obtenerGasto, obtenerGastos } from "./controllers/gastosController.js";
 
 const app = express();
 app.use(express.json());
@@ -46,6 +49,7 @@ app.use(`/gastos`, gastosRoutes);
 app.use(`/ventas`, ventasRoutes);
 app.use(`/productos`, productosRoutes);
 app.use(`/pruebas`, pruebasRoutes);
+app.use(`/estadisticas`, estadisticasRoutes);
 
 app.use(`/caja`, cajaRoutes);
 
@@ -141,3 +145,5 @@ console.log("Obtener estadisticas")
 // obtenerEstadisticas();
 // console.log("Obtener ventas")
 // obtenerEstadisticasVenta();
+// obtenerEstadisticasGastos();
+// obtenerVentas();

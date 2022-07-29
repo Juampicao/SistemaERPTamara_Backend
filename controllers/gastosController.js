@@ -1,12 +1,49 @@
+import { FechaHoyArgentina, formatearFecha } from "../helpers/funciones.js";
 import Gasto from "../models/Gasto.js";
 import Usuario from "../models/Usuario.js";
 
-// Traer todos los gastos. Postman /gastos.
+
+const obtenerEstadisticasGastos = async (req, res) => {
+
+  // const buscarPorFecha = await Gasto.find({ "$fecha": "2022-06-27T15:00:00.000Z" });
+  // console.log(buscarPorFecha)
+    
+
+  // const prueba = await Gasto.find({ createdAt: { $gte: "2022-07-27T15:00:00.000Z"} } ); // Solo Mayor al 27/7.
+  // console.log(prueba)
+
+  const buscarPorFecha = await Gasto.find({ createdAt: { $gt: "2022-07-27T00:00:00.000Z", $lt: "2022-07-28T00:00:00.000Z" } }).where("categoria").equals("Comida"); // Entre el 27 y 28, Categoria = Comida. 
+  console.log(buscarPorFecha)
+  let diaHoy = "2022-07-27T00:00:00.000Z";
+   const obtenerValoresUnicos = await Gasto.aggregate([
+    { $match: {} },
+    {
+      $group: {
+        _id: "Valor Total de Gastos",
+        valor: { $sum: "$valor" },
+      },
+    },
+   ]); 
+  
+  console.log(obtenerValoresUnicos)
+  
+  // res.json({buscarPorFecha})
+   
+  // const prueba = await Gasto.find({ createdAt: { lt: new Date(), $gt: new Date(new Date().getTime() - (24 * 60 * 60 * 1000)) } })
+  // console.log(prueba)
+   
+}
+
 const obtenerGastos = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  // Solo los que creo el usuario
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  
+  const gastos = await Gasto.find().where("creador").equals(req.usuario);
 
+  // Invocar Funciones Extenrnas. 
+  obtenerEstadisticasGastos();
+
+
+  
   const obtenerValoresUnicos = await Gasto.aggregate([
     { $match: {} },
     {
@@ -15,35 +52,27 @@ const obtenerGastos = async (req, res) => {
         valor: { $sum: "$valor" },
       },
     },
-  ]); // Suma de cada categoria.
-  // console.log(obtenerValoresUnicos);
+  ]); 
 
-  // const obtenerTotalGastosUnicos = await Gasto.find().where("valor").equals(9);
-  // console.log(obtenerTotalGastosUnicos)
-
-  const gastos = await Gasto.find().where("creador").equals(req.usuario);
-  // console.log(gastos);
 
   // Creando arrays por categoira.
   const arrayGastosComida = await Gasto.find()
     .where("categoria")
     .equals("Comida");
-  // console.log(arrayGastosComida);
+  
 
   const arrayGastosVarios = await Gasto.find()
     .where("categoria")
     .equals("Gastos");
-  // console.log(arrayGastosVarios);
 
   const arrayGastosProveedor = await Gasto.find()
     .where("categoria")
     .equals("Proveedor");
-  // console.log(arrayGastosProveedor);
 
   const arrayGastosInventario = await Gasto.find()
     .where("categoria")
     .equals("Inventario");
-  // console.log(arrayGastosInventario);
+  
 
   // Creando Arrays solo del valor.
   let arrayGastosComidaValores = [];
@@ -87,6 +116,14 @@ const obtenerGastos = async (req, res) => {
     arrayGastosVariosValores +
     arrayGastosProveedorValores +
     arrayGastosInventarioValores;
+  
+  let sumaMontoTotalGastos = 
+ montoTotalGastosComida +
+        montoTotalGastosVarios +
+          montoTotalGastosProveedores +
+        montoTotalGastosInventario
+  
+  // console.log(pruebaSuma)
 
   res.json({
     gastos,
@@ -100,12 +137,14 @@ const obtenerGastos = async (req, res) => {
     montoTotalGastosInventario,
     montoTotalGastos,
     obtenerValoresUnicos,
+    // obtenerValoresUnicosHoy,
+    sumaMontoTotalGastos,
   });
 
-  // Todos los gastos creados por cualquiera
-  // const gasto = await Gasto.find();
-  // res.json(gasto);
 };
+
+
+
 
 const nuevoGasto = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -185,81 +224,14 @@ const eliminarGasto = async (req, res) => {
   }
 };
 
-const crearArraysValoresDeGastos = async (req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
 
-  const arrayGastosComida = await Gasto.find()
-    .where("categoria")
-    .equals("Comida");
-  // res.json(arrayGastosComida);
-  // console.log(arrayGastosComida);
-  // --- Funcion arrays nuevos y sumas dinamicas -----//
-  // let arrayGastosComida = [];
-  // let arrayGastosVarios = [];
-  // let arrayGastosProveedor = [];
 
-  // function crearArraysGastosSegmentados() {
-  //   for (let i = 0; i < gastos.length; i++) {
-  //     if (gastos[i].categoria === "Comida") {
-  //       arrayGastosComida.push(gastos[i]);
-  //     }
-  //     if (gastos[i].categoria === "Gastos") {
-  //       arrayGastosVarios.push(gastos[i]);
-  //     }
-  //     if (gastos[i].categoria === "Proveedor") {
-  //       arrayGastosProveedor.push(gastos[i]);
-  //     }
-  //   }
-  // }
-  // crearArraysGastosSegmentados();
-  // // console.log(arrayGastosComida, arrayGastosVarios, arrayGastosProveedor);
 
-  // // 2) Crear Array con los valores de gastosComida.
-  // let arrayGastosComidaValores = [];
-  // let arrayGastosVariosValores = [];
-  // let arrayGastosProveedorValores = [];
-  // function crearArrayValores(oldArr, newArr) {
-  //   for (let i = 0; i < oldArr.length; i++) {
-  //     let result = oldArr[i].valor;
-  //     newArr.push(result);
-  //     // console.log(newArr);
-  //   }
-  // }
-  // crearArrayValores(arrayGastosComida, arrayGastosComidaValores);
-  // crearArrayValores(arrayGastosVarios, arrayGastosVariosValores);
-  // crearArrayValores(arrayGastosProveedor, arrayGastosProveedorValores);
-
-  // // 3) Funcion suma de arrays, dinamico.
-  // function sumarNumerosArray(arr) {
-  //   // arr && arr.length ? arr : [0, 0];
-  //   const reducer = (accumulator, curr) => accumulator + curr;
-  //   let resultado = arr.reduce(reducer);
-  //   // console.log(resultado);
-  //   return resultado;
-  // }
-};
-
-const obtenerEstadisticas = async (req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-
-  const obtenerValoresUnicos = await Gasto.aggregate([
-    { $match: {} },
-    {
-      $group: {
-        _id: "$categoria",
-        valor: { $sum: "$valor" },
-      },
-    },
-  ]); // 9 . ${Match} => Excluir o solo seleccionar algunas propiedades. ${Group}, iterar sobre estas categorias.
-  console.log("ESTA ACA REY");
-  // console.log(obtenerValoresUnicos);
-};
 export {
   obtenerGastos,
   nuevoGasto,
   obtenerGasto,
   editarGasto,
   eliminarGasto,
-  crearArraysValoresDeGastos,
-  obtenerEstadisticas,
+  obtenerEstadisticasGastos,
 };
