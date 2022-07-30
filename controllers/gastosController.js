@@ -2,48 +2,44 @@ import { FechaHoyArgentina, formatearFecha } from "../helpers/funciones.js";
 import Gasto from "../models/Gasto.js";
 import Usuario from "../models/Usuario.js";
 
-
 const obtenerEstadisticasGastos = async (req, res) => {
-
   // const buscarPorFecha = await Gasto.find({ "$fecha": "2022-06-27T15:00:00.000Z" });
   // console.log(buscarPorFecha)
-    
-
   // const prueba = await Gasto.find({ createdAt: { $gte: "2022-07-27T15:00:00.000Z"} } ); // Solo Mayor al 27/7.
   // console.log(prueba)
-
-  const buscarPorFecha = await Gasto.find({ createdAt: { $gt: "2022-07-27T00:00:00.000Z", $lt: "2022-07-28T00:00:00.000Z" } }).where("categoria").equals("Comida"); // Entre el 27 y 28, Categoria = Comida. 
-  console.log(buscarPorFecha)
-  let diaHoy = "2022-07-27T00:00:00.000Z";
-   const obtenerValoresUnicos = await Gasto.aggregate([
-    { $match: {} },
-    {
-      $group: {
-        _id: "Valor Total de Gastos",
-        valor: { $sum: "$valor" },
-      },
-    },
-   ]); 
-  
-  console.log(obtenerValoresUnicos)
-  
+  // const buscarPorFecha = await Gasto.find({
+  //   createdAt: {
+  //     $gt: "2022-07-27T00:00:00.000Z",
+  //     $lt: "2022-07-28T00:00:00.000Z",
+  //   },
+  // })
+  //   .where("categoria")
+  //   .equals("Comida"); // Entre el 27 y 28, Categoria = Comida.
+  // console.log(buscarPorFecha);
+  // let diaHoy = "2022-07-27T00:00:00.000Z";
+  // const obtenerValoresUnicos = await Gasto.aggregate([
+  //   { $match: {} },
+  //   {
+  //     $group: {
+  //       _id: "Valor Total de Gastos",
+  //       valor: { $sum: "$valor" },
+  //     },
+  //   },
+  // ]);
+  // console.log(obtenerValoresUnicos);
   // res.json({buscarPorFecha})
-   
   // const prueba = await Gasto.find({ createdAt: { lt: new Date(), $gt: new Date(new Date().getTime() - (24 * 60 * 60 * 1000)) } })
   // console.log(prueba)
-   
-}
+};
 
 const obtenerGastos = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  
+
   const gastos = await Gasto.find().where("creador").equals(req.usuario);
 
-  // Invocar Funciones Extenrnas. 
+  // Invocar Funciones Extenrnas.
   obtenerEstadisticasGastos();
 
-
-  
   const obtenerValoresUnicos = await Gasto.aggregate([
     { $match: {} },
     {
@@ -52,14 +48,12 @@ const obtenerGastos = async (req, res) => {
         valor: { $sum: "$valor" },
       },
     },
-  ]); 
-
+  ]);
 
   // Creando arrays por categoira.
   const arrayGastosComida = await Gasto.find()
     .where("categoria")
     .equals("Comida");
-  
 
   const arrayGastosVarios = await Gasto.find()
     .where("categoria")
@@ -72,7 +66,6 @@ const obtenerGastos = async (req, res) => {
   const arrayGastosInventario = await Gasto.find()
     .where("categoria")
     .equals("Inventario");
-  
 
   // Creando Arrays solo del valor.
   let arrayGastosComidaValores = [];
@@ -116,13 +109,13 @@ const obtenerGastos = async (req, res) => {
     arrayGastosVariosValores +
     arrayGastosProveedorValores +
     arrayGastosInventarioValores;
-  
-  let sumaMontoTotalGastos = 
- montoTotalGastosComida +
-        montoTotalGastosVarios +
-          montoTotalGastosProveedores +
-        montoTotalGastosInventario
-  
+
+  let sumaMontoTotalGastos =
+    montoTotalGastosComida +
+    montoTotalGastosVarios +
+    montoTotalGastosProveedores +
+    montoTotalGastosInventario;
+
   // console.log(pruebaSuma)
 
   res.json({
@@ -140,11 +133,7 @@ const obtenerGastos = async (req, res) => {
     // obtenerValoresUnicosHoy,
     sumaMontoTotalGastos,
   });
-
 };
-
-
-
 
 const nuevoGasto = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -223,9 +212,6 @@ const eliminarGasto = async (req, res) => {
     console.log(error);
   }
 };
-
-
-
 
 export {
   obtenerGastos,

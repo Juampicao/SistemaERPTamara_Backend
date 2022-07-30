@@ -31,10 +31,10 @@ dotenv.config();
 conectarDB();
 // const whitelist = [`http://localhost:3000`];
 
+console.log(`La variable de entorno es ${process.env.FRONTEND_URL}`);
+
 // Configurar CORS
 const whitelist = [process.env.FRONTEND_URL];
-
-// console.log(`La variable de entorno es ${process.env.FRONTEND_URL}`);
 
 const corsOptions = {
   origin: function (origin, callback) {

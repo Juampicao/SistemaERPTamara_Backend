@@ -4,6 +4,8 @@ import Caja from "../models/Caja.js";
 
 const obtenerEstadisticasGenerales = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
+  const { id } = req.params;
+
   const obtenerMontoTotalGastos = await Gasto.aggregate([
     { $match: {} },
     {
