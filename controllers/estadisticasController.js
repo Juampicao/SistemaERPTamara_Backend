@@ -3,6 +3,7 @@ import Venta from "../models/Venta.js";
 import Caja from "../models/Caja.js";
 
 const obtenerEstadisticasGenerales = async (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
   const obtenerMontoTotalGastos = await Gasto.aggregate([
     { $match: {} },
     {
