@@ -13,8 +13,15 @@ import estadisticasRoutes from "./routes/estadisticasRoutes.js";
 import Prueba from "./models/Prueba.js";
 import Venta from "./models/Venta.js";
 import { obtenerEstadisticas } from "./controllers/productosController.js";
-import { obtenerEstadisticasVenta, obtenerVentas } from "./controllers/ventasController.js";
-import { obtenerEstadisticasGastos, obtenerGasto, obtenerGastos } from "./controllers/gastosController.js";
+import {
+  obtenerEstadisticasVenta,
+  obtenerVentas,
+} from "./controllers/ventasController.js";
+import {
+  obtenerEstadisticasGastos,
+  obtenerGasto,
+  obtenerGastos,
+} from "./controllers/gastosController.js";
 
 const app = express();
 app.use(express.json());
@@ -141,7 +148,7 @@ app.listen(PORT, () => {
 // }
 //
 
-console.log("Obtener estadisticas")
+// console.log("Obtener estadisticas")
 // obtenerEstadisticas();
 // console.log("Obtener ventas")
 // obtenerEstadisticasVenta();
