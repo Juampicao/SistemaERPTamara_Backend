@@ -28,20 +28,6 @@ const obtenerEstadisticasGenerales = async (req, res) => {
   ]);
   const montoTotalVentas = obtenerMontoTotalVentas[0].valorTotal;
 
-  // const obtenerMontoTotalVentasCategorias = await Venta.aggregate([
-  //   { $match: {} },
-  //   {
-  //     $group: {
-  //       _id: "$metodoPago",
-  //       ValorTotal: { $sum: "$valorTotal" },
-  //     },
-  //   },
-  // ]);
-  // const montoTotalVentasEfectivo =
-  //   obtenerMontoTotalVentasCategorias[0].ValorTotal;
-  // const montoTotalVentasTarjeta =
-  //   obtenerMontoTotalVentasCategorias[1].ValorTotal;
-
   // Ventas Efectivo
   const obtenerMontoTotalVentasEfectivo = await Venta.aggregate([
     { $match: { metodoPago: { $in: ["Efectivo"] } } },
@@ -79,21 +65,6 @@ const obtenerEstadisticasGenerales = async (req, res) => {
 };
 
 const obtenerEstadisticasGastos = async (req, res) => {
-  // const obtenerMontosGastosCategorias = await Gasto.aggregate([
-  //   { $match: {} },
-  //   {
-  //     $group: {
-  //       _id: "$categoria",
-  //       valor: { $sum: "$valor" },
-  //     },
-  //   },
-  // ]);
-  // console.log(obtenerMontosGastosCategorias);
-  // const montoTotalGastosProveedores = obtenerMontosGastosCategorias[1].valor;
-  // const montoTotalGastosVarios = obtenerMontosGastosCategorias[0].valor;
-  // const montoTotalGastosComida = obtenerMontosGastosCategorias[2].valor;
-  // const montoTotalGastosInventario = obtenerMontosGastosCategorias[3].valor;
-
   const obtenerMontoTotalComida = await Gasto.aggregate([
     { $match: { categoria: { $in: ["Comida"] } } },
     {
@@ -105,7 +76,7 @@ const obtenerEstadisticasGastos = async (req, res) => {
   ]);
   const montoTotalGastosComida = obtenerMontoTotalComida[0].valor;
 
-  const obtenerMontoTotalGastosVarios = await Gasto.aggregate([
+  const obtenerMontoTotalGastosProveedores = await Gasto.aggregate([
     { $match: { categoria: { $in: ["Proveedor"] } } },
     {
       $group: {
@@ -114,9 +85,10 @@ const obtenerEstadisticasGastos = async (req, res) => {
       },
     },
   ]);
-  const montoTotalGastosProveedores = obtenerMontoTotalGastosVarios[0].valor;
+  const montoTotalGastosProveedores =
+    obtenerMontoTotalGastosProveedores[0].valor;
 
-  const obtenerMontoTotalProveedores = await Gasto.aggregate([
+  const obtenerMontoTotalGastosVarios = await Gasto.aggregate([
     { $match: { categoria: { $in: ["Gastos"] } } },
     {
       $group: {
@@ -125,17 +97,41 @@ const obtenerEstadisticasGastos = async (req, res) => {
       },
     },
   ]);
-  const montoTotalGastosVarios = obtenerMontoTotalProveedores[0].valor;
+  const montoTotalGastosVarios = obtenerMontoTotalGastosVarios[0].valor;
+
+  const obtenerMontoTotalGastosInventario = await Gasto.aggregate([
+    { $match: { categoria: { $in: ["Inventario"] } } },
+    {
+      $group: {
+        _id: "$categoria",
+        valor: { $sum: "$valor" },
+      },
+    },
+  ]);
+  const montoTotalGastosInventario = 0;
+  // obtenerMontoTotalGastosInventario[0].valor;
 
   res.json({
     montoTotalGastosProveedores,
     montoTotalGastosVarios,
     montoTotalGastosComida,
-    obtenerMontoTotalComida,
+    montoTotalGastosInventario,
   });
 };
 
 const obtenerEstadisticasVentas = async (req, res) => {
+  // Monto Total Ventas
+  const obtenerMontoTotalVentas = await Venta.aggregate([
+    { $match: {} },
+    {
+      $group: {
+        _id: "Valor Total de Ventas",
+        valorTotal: { $sum: "$valorTotal" },
+      },
+    },
+  ]);
+  const montoTotalVentas = obtenerMontoTotalVentas[0].valorTotal;
+
   // Ventas Efectivo
   const obtenerMontoTotalVentasEfectivo = await Venta.aggregate([
     { $match: { metodoPago: { $in: ["Efectivo"] } } },
@@ -161,6 +157,7 @@ const obtenerEstadisticasVentas = async (req, res) => {
   const montoTotalVentasTarjeta = obtenerMontoTotalVentasTarjeta[0].valor;
 
   res.json({
+    montoTotalVentas,
     montoTotalVentasTarjeta,
     montoTotalVentasEfectivo,
   });

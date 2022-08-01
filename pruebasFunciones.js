@@ -125,6 +125,31 @@
 //   .equals("Comida");
 // console.log(buscarPorFecha);
 
+// const obtenerMontoTotalVentasCategorias = await Venta.aggregate([
+//   { $match: {} },
+//   {
+//     $group: {
+//       _id: "$metodoPago",
+//       ValorTotal: { $sum: "$valorTotal" },
+//     },
+//   },
+// ]);
+// const montoTotalVentasEfectivo =
+//   obtenerMontoTotalVentasCategorias[0].ValorTotal;
+// const montoTotalVentasTarjeta =
+//   obtenerMontoTotalVentasCategorias[1].ValorTotal;
+
+// const obtenerMontosGastosCategorias = await Gasto.aggregate([
+//   { $match: {} },
+//   {
+//     $group: {
+//       _id: "$categoria",
+//       valor: { $sum: "$valor" },
+//     },
+//   },
+// ]);
+// console.log(obtenerMontosGastosCategorias);
+
 // console.log("Obtener estadisticas")
 // obtenerEstadisticas();
 // console.log("Obtener ventas")
