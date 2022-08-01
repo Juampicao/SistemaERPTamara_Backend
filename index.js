@@ -31,6 +31,7 @@ app.use(express.json());
 dotenv.config();
 
 conectarDB();
+
 // const whitelist = [`http://localhost:3000`];
 
 console.log(`La variable de entorno es ${process.env.FRONTEND_URL}`);
@@ -65,5 +66,5 @@ app.use(`/caja`, cajaRoutes);
 const PORT = process.env.PORT || 4000;
 
 app.listen(PORT, () => {
-  console.log("Servidor Corriendo en puerto 4000");
+  console.log("Servidor Corriendo en el puerto 4000");
 });
