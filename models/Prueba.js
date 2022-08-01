@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { FechaHoyArgentina } from "../helpers/funciones.js";
 
 const pruebaSchema = mongoose.Schema(
   {
@@ -6,6 +7,10 @@ const pruebaSchema = mongoose.Schema(
       type: String,
       trim: true,
       required: true,
+    },
+    fecha: {
+      type: Date,
+      default: FechaHoyArgentina,
     },
     productoComprado: {
       type: String,

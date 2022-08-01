@@ -13,7 +13,10 @@ import checkAuth from "../middleware/checkAuth.js";
 
 const router = express.Router();
 
-router.route(`/`).get(obtenerProductos,obtenerEstadisticas).post(nuevoProducto);
+router
+  .route(`/`)
+  .get(obtenerProductos, obtenerEstadisticas)
+  .post(nuevoProducto);
 
 router
   .route("/:id")

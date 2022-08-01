@@ -3,7 +3,6 @@ import Usuario from "../models/Usuario.js";
 import Producto from "../models/Producto.js";
 import { crearArrayValores, sumarNumerosArray } from "../helpers/funciones.js";
 
-
 const obtenerVentas = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   // Solo los que creo el usuario
@@ -30,9 +29,7 @@ const obtenerVentas = async (req, res) => {
 
   // 3) sumo los valores
   let montoTotalVentasEfectivo = sumarNumerosArray(arrayVentasEfectivoValores);
-  // console.log(montoTotalVentasEfectivo);
-
-     const montoTotalVentasEfectivoNuevo = await Venta.aggregate([
+  const montoTotalVentasEfectivoNuevo = await Venta.aggregate([
     { $match: {} },
     {
       $group: {
@@ -40,7 +37,7 @@ const obtenerVentas = async (req, res) => {
         valorTotal: { $sum: "$valorTotal" },
       },
     },
-     ]); 
+  ]);
   // console.log(montoTotalVentasEfectivoNuevo)
 
   //4 Respuesta Json
@@ -56,6 +53,17 @@ const nuevaVenta = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   const venta = new Venta(req.body);
 
+  if (venta.productoVendido) {
+    const producto = await Producto.findById(venta.productoVendido);
+    console.log(producto);
+    const productoActualizado = await Producto.findOneAndUpdate(
+      {
+        _id: venta.productoVendido,
+      },
+      { cantidad: producto.cantidad - venta.cantidad }
+    );
+  }
+
   try {
     const ventAlmacenada = await venta.save();
 
@@ -67,17 +75,14 @@ const nuevaVenta = async (req, res) => {
   }
 };
 
-// Gasto individual. Escribir ID.
 const obtenerVenta = async (req, res) => {
   const { id } = req.params;
   console.log(id);
-  const venta = await Venta.findById(id);
-  // .populate("productoVendido");
+  const venta = await Venta.findById(id).populate("productoVendido");
   res.json(venta);
   console.log(venta);
 };
 
-// Si cambio solo uno, lo demas sigue igual. Solo edita quien lo creo.
 const editarVenta = async (req, res) => {
   const { id } = req.params;
   const venta = await Venta.findById(id);
@@ -106,16 +111,26 @@ const editarVenta = async (req, res) => {
 
 const eliminarVenta = async (req, res) => {
   const { id } = req.params;
+
   const venta = await Venta.findById(id);
+  console.log(venta);
+
+  if (venta.productoVendido) {
+    const producto = await Producto.findById(venta.productoVendido);
+    if (producto) {
+      const productoActualizado = await Producto.findOneAndUpdate(
+        {
+          _id: venta.productoVendido,
+        },
+        { cantidad: producto.cantidad + venta.cantidad }
+      );
+    }
+  }
 
   if (!venta) {
     const error = new Error("Ninguna Venta se ha encontrado");
     return res.status(404).json({ msg: error.message });
   }
-  // if (proyecto.creador.toString() !== req.usuario._id.toString()) {
-  //   const error = new Error("Accion no valida");
-  //   return res.status(401).json({ msg: error.message });
-  // }
 
   try {
     await venta.deleteOne();
@@ -126,25 +141,29 @@ const eliminarVenta = async (req, res) => {
 };
 
 const obtenerEstadisticasVenta = async (req, res) => {
-
   const cantidadVendidaPorProducto = await Venta.aggregate([
     { $match: {} },
     { $group: { _id: "$producto", valorIndividual: { $sum: "$valorTotal" } } },
   ]);
-  
+
   const ventasUnicas = await Venta.count();
 
   const cantidadesVendidas = await Venta.aggregate([
-      {
-        $group:
-          { _id: "$producto", cantidad: { $sum: 1 } }
-      },
+    {
+      $group: { _id: "$producto", cantidad: { $sum: 1 } },
+    },
   ]);
-  
 
-  console.log("ventas")
+  console.log("ventas");
   // console.log(cantidadVendidaPorProducto, ventasUnicas, cantidadesVendidas)
-  res.json({cantidadVendidaPorProducto, ventasUnicas, cantidadesVendidas})
-}
+  res.json({ cantidadVendidaPorProducto, ventasUnicas, cantidadesVendidas });
+};
 
-export { obtenerVentas, nuevaVenta, obtenerVenta, editarVenta, eliminarVenta,obtenerEstadisticasVenta };
+export {
+  obtenerVentas,
+  nuevaVenta,
+  obtenerVenta,
+  editarVenta,
+  eliminarVenta,
+  obtenerEstadisticasVenta,
+};

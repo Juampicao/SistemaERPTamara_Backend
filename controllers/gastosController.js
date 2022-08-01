@@ -1,5 +1,6 @@
 import { FechaHoyArgentina, formatearFecha } from "../helpers/funciones.js";
 import Gasto from "../models/Gasto.js";
+import Producto from "../models/Producto.js";
 import Usuario from "../models/Usuario.js";
 
 const obtenerEstadisticasGastos = async (req, res) => {
@@ -130,7 +131,6 @@ const obtenerGastos = async (req, res) => {
     montoTotalGastosInventario,
     montoTotalGastos,
     obtenerValoresUnicos,
-    // obtenerValoresUnicosHoy,
     sumaMontoTotalGastos,
   });
 };
@@ -138,28 +138,39 @@ const obtenerGastos = async (req, res) => {
 const nuevoGasto = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   const gasto = new Gasto(req.body);
-  // gasto.creador = req.usuario._id;
+
+  if (gasto.productoIngresado) {
+    const producto = await Producto.findById(gasto.productoIngresado);
+    const actualizarCantidadProducto = await Producto.findByIdAndUpdate(
+      {
+        _id: gasto.productoIngresado,
+      },
+      {
+        cantidad: producto.cantidad + gasto.cantidadProductoIngresado,
+      }
+    );
+  }
+
   try {
     const gastoAlmacenado = await gasto.save();
     console.log(gastoAlmacenado);
     res.json(gastoAlmacenado);
   } catch (error) {
     console.log(error);
+    res.json(error);
   }
 };
 
 // Gasto individual. Escribir ID.
 const obtenerGasto = async (req, res) => {
   const { id } = req.params;
-  console.log(id);
-  const gasto = await Gasto.findById(id);
-  // .populate("productoVendido");
+  const gasto = await Gasto.findById(id).populate("productoIngresado");
   res.json(gasto);
-
-  // if (!gasto) {
-  //   const error = new Error("No Encontrado");
-  //   return res.status(404).json({ msg: error.message });
-  // }
+  console.log(gasto);
+  if (!gasto) {
+    const error = new Error("No Encontrado");
+    return res.status(404).json({ msg: error.message });
+  }
 
   // {
   //   const error = new Error("Acción No Válida");
@@ -195,6 +206,19 @@ const editarGasto = async (req, res) => {
 const eliminarGasto = async (req, res) => {
   const { id } = req.params;
   const gasto = await Gasto.findById(id);
+  console.log(gasto);
+
+  if (gasto.productoIngresado) {
+    const producto = await Producto.findById(gasto.productoIngresado);
+    if (producto) {
+      const productoActualizado = await Producto.findOneAndUpdate(
+        {
+          _id: gasto.productoIngresado,
+        },
+        { cantidad: producto.cantidad - gasto.cantidadProductoIngresado }
+      );
+    }
+  }
 
   if (!gasto) {
     const error = new Error("Ningun Gasto se ha encontrado");
