@@ -6,9 +6,7 @@ import { crearArrayValores, sumarNumerosArray } from "../helpers/funciones.js";
 const obtenerVentas = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   // Solo los que creo el usuario
-  const arrayTotalVentas = await Venta.find()
-    .where("creador")
-    .equals(req.usuario);
+  const arrayTotalVentas = await Venta.find();
 
   // 1) Creando arrays por categoira.
   const arrayVentasEfectivo = await Venta.find()

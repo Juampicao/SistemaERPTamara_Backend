@@ -36,7 +36,8 @@ const obtenerEstadisticasGastos = async (req, res) => {
 const obtenerGastos = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
 
-  const gastos = await Gasto.find().where("creador").equals(req.usuario);
+  const gastos = await Gasto.find().where("creador");
+  // .equals("62ccadb0afe76779ce490981");
 
   // Invocar Funciones Extenrnas.
   obtenerEstadisticasGastos();
@@ -76,6 +77,8 @@ const obtenerGastos = async (req, res) => {
 const nuevoGasto = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   const gasto = new Gasto(req.body);
+  gasto.creador = req.usuario._id;
+  console.log(`El usuario creador es: ${req.usuario.nombre}`);
 
   if (gasto.productoIngresado) {
     const producto = await Producto.findById(gasto.productoIngresado);
@@ -101,14 +104,29 @@ const nuevoGasto = async (req, res) => {
 
 // Gasto individual. Escribir ID.
 const obtenerGasto = async (req, res) => {
+  // res.setHeader("Access-Control-Allow-Origin", "*");
+
   const { id } = req.params;
   const gasto = await Gasto.findById(id).populate("productoIngresado");
+
   res.json(gasto);
   console.log(gasto);
   if (!gasto) {
     const error = new Error("No Encontrado");
+    console.log(error);
     return res.status(404).json({ msg: error.message });
   }
+
+  // if (
+  //   gasto.creador.toString() !== req.usuario._id.toString() &&
+  //   !gasto.colaboradores.some(
+  //     (creador) => creador._id.toString() === req.usuario._id.toString()
+  //   )
+  // ) {
+  //   const error = new Error("Acción No Válida");
+  //   console.log(error);
+  //   return res.status(401).json({ msg: error.message });
+  // }
 };
 
 // // Si cambio solo uno, lo demas sigue igual. Solo edita quien lo creo.
@@ -138,6 +156,8 @@ const editarGasto = async (req, res) => {
 const eliminarGasto = async (req, res) => {
   const { id } = req.params;
   const gasto = await Gasto.findById(id);
+  console.log(`El usuario Borrador es: ${req.usuario}`);
+
   console.log(gasto);
 
   if (gasto.productoIngresado) {

@@ -35,11 +35,10 @@ const gastosSchema = mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Producto",
     },
-    // ,
-    // creador: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "Usuario",
-    // },
+    creador: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Usuario",
+    },
     // tareas: [
     //   {
     //     type: mongoose.Schema.Types.ObjectId,

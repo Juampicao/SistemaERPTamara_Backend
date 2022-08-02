@@ -35,14 +35,12 @@ const autenticar = async (req, res) => {
     const error = new Error("El usuario no existe");
     return res.status(404).json({ msg: error.message });
   }
-  console.log(usuario);
 
   // Comprobar si el usuario CONFIMADO
   if (!usuario.confirmado) {
     const error = new Error("El usuario no ha sido confirmado");
     return res.status(403).json({ msg: error.message });
   }
-  console.log(usuario);
 
   // Comprobar PASSWORD
   if (await usuario.comprobarPassword(password)) {
@@ -52,7 +50,9 @@ const autenticar = async (req, res) => {
       email: usuario.email,
       token: generarJWT(usuario._id),
     });
-    console.log("El password es Correcto");
+    console.log(
+      ` Entrando desde...  : ${usuario.nombre} - ${usuario.email} - ${usuario.token}`
+    );
   } else {
     const error = new Error("El password es incorrecto");
     console.log("El password es Incorrecto");
@@ -134,7 +134,8 @@ const nuevoPassword = async (req, res) => {
 
 const perfil = async (req, res) => {
   const { usuario } = req;
-
+  console.log("Desde perfil....");
+  console.log(`Desde usuario, ${usuario}`);
   res.json(usuario);
 };
 
