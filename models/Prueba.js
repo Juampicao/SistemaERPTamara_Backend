@@ -10,7 +10,6 @@ const pruebaSchema = mongoose.Schema(
     },
     fecha: {
       type: Date,
-      default: FechaHoyArgentina,
     },
     productoComprado: {
       type: String,

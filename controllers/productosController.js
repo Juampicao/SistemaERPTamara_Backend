@@ -9,12 +9,13 @@ const obtenerProductos = async (req, res) => {
 };
 
 const nuevoProducto = async (req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  // res.setHeader("Access-Control-Allow-Origin", "*");
   const producto = new Producto(req.body);
-  // producto.creador = req.usuario._id;
+  producto.creador = req.usuario._id;
   try {
     const productoAlmacenado = await producto.save();
     console.log(productoAlmacenado);
+    console.log(`El producto fue creado por: ${req.usuario.nombre}`);
     res.json(productoAlmacenado);
   } catch (error) {
     console.log(error);
@@ -58,6 +59,8 @@ const editarProducto = async (req, res) => {
   producto.categoria = req.body.categoria || producto.categoria;
   producto.fecha = req.body.fecha || producto.fecha;
   producto.descripcion = req.body.descripcion || producto.descripcion;
+
+  producto.creador = req.body.creador || producto.creador;
 
   try {
     const productoAlmacenado = await producto.save();

@@ -6,12 +6,16 @@ import {
   obtenerCaja,
 } from "../controllers/cajaController.js";
 
-// import checkAuth from "../middleware/checkAuth.js";
+import checkAuth from "../middleware/checkAuth.js";
 
 const router = express.Router();
 
-router.route("/").post(nuevaCaja);
+router.route("/").post(checkAuth, nuevaCaja);
 
-router.route("/:id").put(editarCaja).get(obtenerCaja);
+router.route("/:id").put(checkAuth, editarCaja).get(checkAuth, obtenerCaja);
+// router
+//   .route("/editarcaja")
+//   .put(checkAuth, editarCaja)
+//   .get(checkAuth, obtenerCaja);
 
 export default router;

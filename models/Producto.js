@@ -37,6 +37,10 @@ const productoSchema = mongoose.Schema(
       trim: true,
       required: false,
     },
+    creador: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Usuario",
+    },
   },
   {
     timestamps: true,

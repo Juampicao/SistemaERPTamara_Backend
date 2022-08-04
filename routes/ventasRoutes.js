@@ -13,11 +13,15 @@ import checkAuth from "../middleware/checkAuth.js";
 
 const router = express.Router();
 
-router.route(`/`).get(obtenerVentas, obtenerEstadisticasVenta).post(nuevaVenta);
-// router.route(`/`).get(obtenerVentas).post(nuevaVenta);
+router
+  .route(`/`)
+  .get(checkAuth, obtenerVentas, obtenerEstadisticasVenta)
+  .post(checkAuth, nuevaVenta);
 
-router.route("/:id").get(obtenerVenta).put(editarVenta).delete(eliminarVenta);
-
-// router.get('/ventas/estadisticas', obtenerEstadisticasVenta);
+router
+  .route("/:id")
+  .get(checkAuth, obtenerVenta)
+  .put(checkAuth, editarVenta)
+  .delete(checkAuth, eliminarVenta);
 
 export default router;

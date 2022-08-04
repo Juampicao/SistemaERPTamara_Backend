@@ -115,8 +115,6 @@ const nuevoPassword = async (req, res) => {
   const { token } = req.params;
   const { password } = req.body;
 
-  console.log(token);
-  console.log(password);
   const usuario = await Usuario.findOne({ token });
 
   if (usuario) {
@@ -135,7 +133,7 @@ const nuevoPassword = async (req, res) => {
 const perfil = async (req, res) => {
   const { usuario } = req;
   console.log("Desde perfil....");
-  console.log(`Desde usuario, ${usuario}`);
+  console.log(`Desde usuario, El nombre es: ${usuario.nombre}`);
   res.json(usuario);
 };
 

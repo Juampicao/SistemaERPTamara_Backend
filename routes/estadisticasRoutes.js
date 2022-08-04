@@ -4,14 +4,18 @@ import {
   obtenerEstadisticasGenerales,
   obtenerEstadisticasGastos,
   obtenerEstadisticasVentas,
+  obtenerEstadisticasPorFecha,
 } from "../controllers/estadisticasController.js";
 
 import checkAuth from "../middleware/checkAuth.js";
 
 const router = express.Router();
 
-router.route(`/`).get(obtenerEstadisticasGenerales);
-router.route("/gastos").get(obtenerEstadisticasGastos);
-router.route("/ventas").get(obtenerEstadisticasVentas);
+router.route(`/`).get(checkAuth, obtenerEstadisticasGenerales);
+router.route(`/hoy`).get(checkAuth, obtenerEstadisticasPorFecha);
+
+obtenerEstadisticasPorFecha;
+router.route("/gastos").get(checkAuth, obtenerEstadisticasGastos);
+router.route("/ventas").get(checkAuth, obtenerEstadisticasVentas);
 
 export default router;

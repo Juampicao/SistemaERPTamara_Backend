@@ -47,6 +47,10 @@ const ventasSchema = mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Producto",
     },
+    creador: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Usuario",
+    },
   },
   {
     timestamps: true,

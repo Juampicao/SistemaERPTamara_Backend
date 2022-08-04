@@ -6,7 +6,9 @@ import { crearArrayValores, sumarNumerosArray } from "../helpers/funciones.js";
 const obtenerVentas = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   // Solo los que creo el usuario
-  const arrayTotalVentas = await Venta.find();
+  const arrayTotalVentas = await Venta.find()
+    .where("creador")
+    .equals(req.usuario);
 
   // 1) Creando arrays por categoira.
   const arrayVentasEfectivo = await Venta.find()
@@ -50,6 +52,7 @@ const obtenerVentas = async (req, res) => {
 const nuevaVenta = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   const venta = new Venta(req.body);
+  venta.creador = req.usuario._id;
 
   if (venta.productoVendido) {
     const producto = await Producto.findById(venta.productoVendido);
@@ -64,8 +67,7 @@ const nuevaVenta = async (req, res) => {
 
   try {
     const ventAlmacenada = await venta.save();
-
-    // console.log(ventAlmacenada);
+    console.log(ventAlmacenada);
     console.log("Venta creada con exito");
     res.json(ventAlmacenada);
   } catch (error) {
@@ -75,10 +77,27 @@ const nuevaVenta = async (req, res) => {
 
 const obtenerVenta = async (req, res) => {
   const { id } = req.params;
-  console.log(id);
   const venta = await Venta.findById(id).populate("productoVendido");
+
+  if (!venta) {
+    const error = new Error("venta No Encontrado");
+    console.log(error);
+    return res.status(404).json({ msg: error.message });
+  }
+
+  if (!venta) {
+    const error = new Error("Ningun venta se ha encontrado");
+    console.log(error);
+    return res.status(404).json({ msg: error.message });
+  }
+
+  if (venta.creador.toString() !== req.usuario._id.toString()) {
+    const error = new Error("No eres el creador de este venta");
+    console.log(error);
+    return res.status(401).json({ msg: error.message });
+  }
   res.json(venta);
-  console.log(venta);
+  console.log(venta.nombre, venta._id, venta.valor);
 };
 
 const editarVenta = async (req, res) => {
@@ -90,6 +109,12 @@ const editarVenta = async (req, res) => {
     return res.status(404).json({ msg: error.message });
   }
 
+  if (venta.creador.toString() !== req.usuario._id.toString()) {
+    const error = new Error("No eres el creador de este venta");
+    console.log(error);
+    return res.status(401).json({ msg: error.message });
+  }
+
   venta.producto = req.body.producto || venta.producto;
   venta.cantidad = req.body.cantidad || venta.cantidad;
   venta.valorIndividual = req.body.valorIndividual || venta.valorIndividual;
@@ -98,6 +123,7 @@ const editarVenta = async (req, res) => {
   venta.categoria = req.body.categoria || venta.categoria;
   venta.fecha = req.body.fecha || venta.fecha;
   venta.notas = req.body.notas || venta.notas;
+  venta.creador = req.body.creador || venta.creador;
 
   try {
     const ventAlmacenada = await venta.save();
@@ -111,7 +137,20 @@ const eliminarVenta = async (req, res) => {
   const { id } = req.params;
 
   const venta = await Venta.findById(id);
-  console.log(venta);
+  console.log(venta.nombre, venta._id, venta.valor);
+
+  if (!venta) {
+    const error = new Error("Ninguna Venta se ha encontrado");
+    return res.status(404).json({ msg: error.message });
+  }
+
+  if (venta.creador.toString() !== req.usuario._id.toString()) {
+    const error = new Error(
+      "No puedes editar, no eres el creador de este venta"
+    );
+    console.log(error);
+    return res.status(401).json({ msg: error.message });
+  }
 
   if (venta.productoVendido) {
     const producto = await Producto.findById(venta.productoVendido);
@@ -123,11 +162,6 @@ const eliminarVenta = async (req, res) => {
         { cantidad: producto.cantidad + venta.cantidad }
       );
     }
-  }
-
-  if (!venta) {
-    const error = new Error("Ninguna Venta se ha encontrado");
-    return res.status(404).json({ msg: error.message });
   }
 
   try {
@@ -153,7 +187,6 @@ const obtenerEstadisticasVenta = async (req, res) => {
   ]);
 
   console.log("ventas");
-  // console.log(cantidadVendidaPorProducto, ventasUnicas, cantidadesVendidas)
   res.json({ cantidadVendidaPorProducto, ventasUnicas, cantidadesVendidas });
 };
 

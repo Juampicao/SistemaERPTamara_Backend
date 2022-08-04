@@ -36,38 +36,37 @@ const obtenerEstadisticasGastos = async (req, res) => {
 const obtenerGastos = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
 
-  const gastos = await Gasto.find().where("creador");
-  // .equals("62ccadb0afe76779ce490981");
+  const gastos = await Gasto.find().where("creador").equals(req.usuario);
 
   // Invocar Funciones Extenrnas.
   obtenerEstadisticasGastos();
 
-  const obtenerValoresUnicos = await Gasto.aggregate([
-    { $match: {} },
-    {
-      $group: {
-        _id: "$categoria",
-        valor: { $sum: "$valor" },
-      },
-    },
-  ]);
+  // const obtenerValoresUnicos = await Gasto.aggregate([
+  //   { $match: {} },
+  //   {
+  //     $group: {
+  //       _id: "$categoria",
+  //       valor: { $sum: "$valor" },
+  //     },
+  //   },
+  // ]);
 
-  // Creando arrays por categoira.
-  const arrayGastosComida = await Gasto.find()
-    .where("categoria")
-    .equals("Comida");
+  // // Creando arrays por categoira.
+  // const arrayGastosComida = await Gasto.find()
+  //   .where("categoria")
+  //   .equals("Comida");
 
-  const arrayGastosVarios = await Gasto.find()
-    .where("categoria")
-    .equals("Gastos");
+  // const arrayGastosVarios = await Gasto.find()
+  //   .where("categoria")
+  //   .equals("Gastos");
 
-  const arrayGastosProveedor = await Gasto.find()
-    .where("categoria")
-    .equals("Proveedor");
+  // const arrayGastosProveedor = await Gasto.find()
+  //   .where("categoria")
+  //   .equals("Proveedor");
 
-  const arrayGastosInventario = await Gasto.find()
-    .where("categoria")
-    .equals("Inventario");
+  // const arrayGastosInventario = await Gasto.find()
+  //   .where("categoria")
+  //   .equals("Inventario");
 
   res.json({
     gastos,
@@ -94,7 +93,11 @@ const nuevoGasto = async (req, res) => {
 
   try {
     const gastoAlmacenado = await gasto.save();
-    console.log(gastoAlmacenado);
+    console.log(
+      gastoAlmacenado.nombre,
+      gastoAlmacenado.valor,
+      gastoAlmacenado.categoria
+    );
     res.json(gastoAlmacenado);
   } catch (error) {
     console.log(error);
@@ -109,27 +112,28 @@ const obtenerGasto = async (req, res) => {
   const { id } = req.params;
   const gasto = await Gasto.findById(id).populate("productoIngresado");
 
-  res.json(gasto);
-  console.log(gasto);
   if (!gasto) {
-    const error = new Error("No Encontrado");
+    const error = new Error("Gasto No Encontrado");
     console.log(error);
     return res.status(404).json({ msg: error.message });
   }
 
-  // if (
-  //   gasto.creador.toString() !== req.usuario._id.toString() &&
-  //   !gasto.colaboradores.some(
-  //     (creador) => creador._id.toString() === req.usuario._id.toString()
-  //   )
-  // ) {
-  //   const error = new Error("Acción No Válida");
-  //   console.log(error);
-  //   return res.status(401).json({ msg: error.message });
-  // }
+  if (!gasto) {
+    const error = new Error("Ningun Gasto se ha encontrado");
+    console.log(error);
+    return res.status(404).json({ msg: error.message });
+  }
+
+  if (gasto.creador.toString() !== req.usuario._id.toString()) {
+    const error = new Error("No eres el creador de este gasto");
+    console.log(error);
+    return res.status(401).json({ msg: error.message });
+  }
+
+  res.json(gasto);
+  console.log(gasto.nombre, gasto._id, gasto.valor);
 };
 
-// // Si cambio solo uno, lo demas sigue igual. Solo edita quien lo creo.
 const editarGasto = async (req, res) => {
   const { id } = req.params;
   const gasto = await Gasto.findById(id);
@@ -139,15 +143,25 @@ const editarGasto = async (req, res) => {
     return res.status(404).json({ msg: error.message });
   }
 
+  if (gasto.creador.toString() !== req.usuario._id.toString()) {
+    const error = new Error(
+      "No puede editar, no eres el creador de este gasto"
+    );
+    console.log(error);
+    return res.status(401).json({ msg: error.message });
+  }
+
   gasto.nombre = req.body.nombre || gasto.nombre;
   gasto.valor = req.body.valor || gasto.valor;
   gasto.categoria = req.body.categoria || gasto.categoria;
   gasto.fecha = req.body.fecha || gasto.fecha;
   gasto.notas = req.body.notas || gasto.notas;
+  gasto.creador = req.body.creador || gasto.creador;
 
   try {
     const gastoAlmacenado = await gasto.save();
     res.json(gastoAlmacenado);
+    console.log(`El usuario editador es: ${req.usuario.nombre}`);
   } catch (error) {
     console.log(error);
   }
@@ -155,10 +169,22 @@ const editarGasto = async (req, res) => {
 
 const eliminarGasto = async (req, res) => {
   const { id } = req.params;
-  const gasto = await Gasto.findById(id);
-  console.log(`El usuario Borrador es: ${req.usuario}`);
 
-  console.log(gasto);
+  const gasto = await Gasto.findById(id);
+
+  console.log(gasto.nombre, gasto._id, gasto.valor);
+
+  if (!gasto) {
+    const error = new Error("Ningun Gasto se ha encontrado");
+    console.log(error);
+    return res.status(404).json({ msg: error.message });
+  }
+
+  if (gasto.creador.toString() !== req.usuario._id.toString()) {
+    const error = new Error("No eres el creador de este gasto");
+    console.log(error);
+    return res.status(401).json({ msg: error.message });
+  }
 
   if (gasto.productoIngresado) {
     const producto = await Producto.findById(gasto.productoIngresado);
@@ -172,18 +198,10 @@ const eliminarGasto = async (req, res) => {
     }
   }
 
-  if (!gasto) {
-    const error = new Error("Ningun Gasto se ha encontrado");
-    return res.status(404).json({ msg: error.message });
-  }
-  // if (proyecto.creador.toString() !== req.usuario._id.toString()) {
-  //   const error = new Error("Accion no valida");
-  //   return res.status(401).json({ msg: error.message });
-  // }
-
   try {
     await gasto.deleteOne();
     res.json({ msg: "Gasto Eliminado" });
+    console.log(`El usuario Borrador es: ${req.usuario.nombre}`);
   } catch (error) {
     console.log(error);
   }

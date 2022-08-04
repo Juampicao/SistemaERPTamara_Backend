@@ -12,15 +12,16 @@ const cajaSchema = mongoose.Schema(
       type: Number,
       trim: true,
       required: true,
+      default: 0,
     },
-    // fecha: {
-    //   type: Date,
-    //   default: Date.now(),
-    // },
-    // id: {
-    //   type: Number,
-    //   default: 1,
-    // }
+    fecha: {
+      type: Date,
+      default: Date.now(),
+    },
+    creador: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Usuario",
+    },
   },
   {
     timestamps: true,

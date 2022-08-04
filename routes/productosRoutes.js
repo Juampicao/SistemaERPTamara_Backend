@@ -15,13 +15,13 @@ const router = express.Router();
 
 router
   .route(`/`)
-  .get(obtenerProductos, obtenerEstadisticas)
-  .post(nuevoProducto);
+  .get(checkAuth, obtenerProductos, obtenerEstadisticas)
+  .post(checkAuth, nuevoProducto);
 
 router
   .route("/:id")
-  .get(obtenerProducto)
-  .put(editarProducto)
-  .delete(eliminarProducto);
+  .get(checkAuth, obtenerProducto)
+  .put(checkAuth, editarProducto)
+  .delete(checkAuth, eliminarProducto);
 
 export default router;

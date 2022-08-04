@@ -150,6 +150,29 @@
 // ]);
 // console.log(obtenerMontosGastosCategorias);
 
+// const AgregarUnaPropiedadAUnoEspecifico = await Gasto.updateOne(
+//   { nombre: "el nombre que tiene.." },
+//   { $set: { creador: "62d30ddb9e73a0088fa71051" } }
+// );
+// console.log(AgregarUnaPropiedadAUnoEspecifico);
+
+// const AgregarUnaPropiedadATodos = await Gasto.updateMany(
+//   {"deja esto en blanco y actualizas todo"},
+//   { $set: { "nombre nuevo de la propiedad": "62d30ddb9e73a0088fa71051" } }
+// );
+// console.log(AgregarUnaPropiedadATodos);
+
+// let resultadoFinal = [];
+// function extraerValoresDeArray() {
+//   for (let i = 0; i < buscarPorFecha.length; i++) {
+//     let result = buscarPorFecha[i].valor;
+//     resultadoFinal.push(result);
+//   }
+//   console.log(resultadoFinal);
+//   return resultadoFinal;
+// }
+// extraerValoresDeArray();
+
 // console.log("Obtener estadisticas")
 // obtenerEstadisticas();
 // console.log("Obtener ventas")

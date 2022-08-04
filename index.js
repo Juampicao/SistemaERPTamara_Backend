@@ -24,6 +24,9 @@ import {
   obtenerGastos,
 } from "./controllers/gastosController.js";
 import Producto from "./models/Producto.js";
+import Caja from "./models/Caja.js";
+
+import { sumarNumerosArray, crearArrayValores } from "./helpers/funciones.js";
 
 const app = express();
 app.use(express.json());
