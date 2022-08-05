@@ -71,3 +71,11 @@ const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log("Servidor Corriendo en el puerto 4000");
 });
+
+// const startDate = new Date("2022-07-26T00:00:00.000Z");
+// const endDate = new Date("2022-07-29T00:00:00.000Z");
+
+// const today = new Date();
+// const yesterday = new Date();
+
+// yesterday.setDate(today.getDate() - 1);

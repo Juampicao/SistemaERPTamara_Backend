@@ -14,8 +14,16 @@ const nuevaCaja = async (req, res) => {
 
 const editarCaja = async (req, res) => {
   // res.setHeader("Access-Control-Allow-Origin", "*");
-  const { id } = req.params;
-  const caja = await Caja.findById(id);
+  // const { id } = req.params;
+  console.log(req.usuario._id);
+  let caja;
+  if ((req.usuario.nombre = "tamara")) {
+    caja = await Caja.findById("62cf04d320fdec269473e073");
+  } else {
+    caja = await Caja.findById("62ec60b16255fc55daea0937");
+  }
+  // const caja = await Caja.findById(id);
+  // const caja = await Caja.find().where("creador").equals(req.usuario._id);
 
   console.log(caja);
   if (!caja) {
@@ -23,7 +31,7 @@ const editarCaja = async (req, res) => {
     return res.status(404).json({ msg: error.message });
   }
 
-  caja.nombre = req.body.nombre || caja.nombre;
+  // caja.nombre = req.body.nombre || caja.nombre;
   caja.inicioCaja = req.body.inicioCaja || caja.inicioCaja;
 
   try {

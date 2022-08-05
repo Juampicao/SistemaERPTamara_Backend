@@ -12,7 +12,7 @@ import checkAuth from "../middleware/checkAuth.js";
 const router = express.Router();
 
 router.route(`/`).get(checkAuth, obtenerEstadisticasGenerales);
-router.route(`/hoy`).get(checkAuth, obtenerEstadisticasPorFecha);
+router.route("/hoy").get(checkAuth, obtenerEstadisticasPorFecha);
 
 obtenerEstadisticasPorFecha;
 router.route("/gastos").get(checkAuth, obtenerEstadisticasGastos);
