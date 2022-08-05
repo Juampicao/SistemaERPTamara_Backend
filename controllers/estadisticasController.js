@@ -1,6 +1,7 @@
 import Gasto from "../models/Gasto.js";
 import Venta from "../models/Venta.js";
 import Caja from "../models/Caja.js";
+import Producto from "../models/Producto.js";
 // import { sumarNumerosArray } from "../helpers/funciones.js";
 
 const today = new Date();
@@ -394,11 +395,54 @@ const obtenerEstadisticasPorFecha = async (req, res) => {
   });
 };
 
+const obtenerEstadisticasInventario = async (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  const { id } = req.params;
+
+  // Ventas Hoy
+  const obtenerCantidadProductosUnicos = await Producto.find().count();
+  console.log(obtenerCantidadProductosUnicos);
+
+  aggregate([
+    {
+      $match: {
+        $and: [
+          { creador: req.usuario._id },
+          { fecha: { $gt: yesterday, $lt: today } },
+        ],
+      },
+    },
+
+    {
+      $group: {
+        _id: "",
+        totalVentas: { $sum: "$valorTotal" },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+      },
+    },
+  ]);
+  let montoTotalProductosUnicos = 0;
+  if (obtenerCantidadProductosUnicos.length) {
+    montoTotalProductosUnicos = obtenerCantidadProductosUnicos[0].totalVentas;
+  } else {
+    montoTotalProductosUnicos = 0;
+  }
+
+  res.json({
+    // montoTotalProductosUnicos,
+    obtenerCantidadProductosUnicos,
+  });
+};
 export {
   obtenerEstadisticasGenerales,
   obtenerEstadisticasGastos,
   obtenerEstadisticasVentas,
   obtenerEstadisticasPorFecha,
+  obtenerEstadisticasInventario,
 };
 
 // 1 Buscar por fecha
