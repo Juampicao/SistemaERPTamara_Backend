@@ -23,6 +23,18 @@ const ventasSchema = mongoose.Schema(
       trim: true,
       required: true,
     },
+    costoUnitario: {
+      type: Number,
+      required: false,
+    },
+    costoTotal: {
+      type: Number,
+      required: false,
+    },
+    gananciaBruta: {
+      type: Number,
+      required: false,
+    },
     metodoPago: {
       type: String,
       trim: true,

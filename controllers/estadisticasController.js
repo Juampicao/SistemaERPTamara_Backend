@@ -31,15 +31,24 @@ const obtenerEstadisticasGenerales = async (req, res) => {
       $group: {
         _id: "Valor Total de Ventas",
         valorTotal: { $sum: "$valorTotal" },
+        gananciaBruta: { $sum: "$gananciaBruta" },
       },
     },
   ]);
-  const montoTotalVentas = obtenerMontoTotalVentas[0].valorTotal;
-  console.log(montoTotalVentas);
+
+  const nuevoArrVentas =
+    obtenerMontoTotalVentas[Object.keys(obtenerMontoTotalVentas)[0]];
+
+  let montoTotalVentas = 0;
+  let UtilidadVenta = 0;
+
+  if (obtenerMontoTotalVentas.length > 0) {
+    montoTotalVentas = nuevoArrVentas.valorTotal;
+    UtilidadVenta = nuevoArrVentas.gananciaBruta;
+  }
 
   // Ventas Efectivo
   const obtenerMontoTotalVentasEfectivo = await Venta.aggregate([
-    // { $match: { metodoPago: { $in: ["Efectivo"] } } },
     {
       $match: {
         $and: [{ creador: req.usuario._id }, { metodoPago: "Efectivo" }],
@@ -52,7 +61,11 @@ const obtenerEstadisticasGenerales = async (req, res) => {
       },
     },
   ]);
-  const montoTotalVentasEfectivo = obtenerMontoTotalVentasEfectivo[0].valor;
+
+  let montoTotalVentasEfectivo = 0;
+  if (obtenerMontoTotalVentasEfectivo.length) {
+    montoTotalVentasEfectivo = obtenerMontoTotalVentasEfectivo[0].valor;
+  }
 
   const obtenerMontoTotalCaja = await Caja.aggregate([
     { $match: { creador: req.usuario._id } },
@@ -80,6 +93,7 @@ const obtenerEstadisticasGenerales = async (req, res) => {
     montoTotalGastos,
     montoCajaActual,
     montoTotalVentas,
+    UtilidadVenta,
   });
 };
 
@@ -258,8 +272,9 @@ const obtenerEstadisticasPorFecha = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   const { id } = req.params;
 
-  // Ventas Hoy
-  const obtenerMontoTotalVentas = await Venta.aggregate([
+  // Nueva Obtener Utilidad Hoy.
+
+  const obtenerUtilidadVentasHoy = await Venta.aggregate([
     {
       $match: {
         $and: [
@@ -268,11 +283,11 @@ const obtenerEstadisticasPorFecha = async (req, res) => {
         ],
       },
     },
-
     {
       $group: {
         _id: "",
         totalVentas: { $sum: "$valorTotal" },
+        gananciaBruta: { $sum: "$gananciaBruta" },
       },
     },
     {
@@ -281,12 +296,17 @@ const obtenerEstadisticasPorFecha = async (req, res) => {
       },
     },
   ]);
+  [{}];
+  console.log(obtenerUtilidadVentasHoy);
+  const nuevoArr =
+    obtenerUtilidadVentasHoy[Object.keys(obtenerUtilidadVentasHoy)[0]];
 
+  let UtilidadVentasHoy = 0;
   let montoTotalVentasHoy = 0;
-  if (obtenerMontoTotalVentas.length) {
-    montoTotalVentasHoy = obtenerMontoTotalVentas[0].totalVentas;
-  } else {
-    montoTotalVentasHoy = 0;
+
+  if (obtenerUtilidadVentasHoy.length > 0) {
+    UtilidadVentasHoy = nuevoArr.gananciaBruta;
+    montoTotalVentasHoy = nuevoArr.totalVentas;
   }
 
   // Ventas Efectivo Hoy
@@ -295,6 +315,7 @@ const obtenerEstadisticasPorFecha = async (req, res) => {
       $match: {
         $and: [
           { creador: req.usuario._id },
+          { metodoPago: "Efectivo" },
           { fecha: { $gt: yesterday, $lt: today } },
         ],
       },
@@ -392,6 +413,7 @@ const obtenerEstadisticasPorFecha = async (req, res) => {
     montoInicioCajasHoy,
     montoTotalVentasEfectivoHoy,
     montoCajaActualHoy,
+    UtilidadVentasHoy,
   });
 };
 

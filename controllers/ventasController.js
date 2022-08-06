@@ -56,18 +56,25 @@ const nuevaVenta = async (req, res) => {
 
   if (venta.productoVendido) {
     const producto = await Producto.findById(venta.productoVendido);
-    console.log(producto);
+    console.log(producto.costo);
     const productoActualizado = await Producto.findOneAndUpdate(
       {
         _id: venta.productoVendido,
       },
       { cantidad: producto.cantidad - venta.cantidad }
     );
+    venta.costoUnitario = producto.costo;
+    // console.log(`El costo Unitario es ${venta.costoUnitario}`);
+    venta.costoTotal = producto.costo * req.body.cantidad;
+    // console.log(`El costo Unitario es ${venta.costoTotal}`);
+    venta.gananciaBruta = req.body.valorTotal - venta.costoTotal;
+    console.log(`Ganancia Bruta es:  ${venta.gananciaBruta}`);
   }
 
   try {
     const ventAlmacenada = await venta.save();
-    console.log(ventAlmacenada);
+    // const costoVentaAlmacenado  = await crearPropiedadCostoEnLaVenta.save();
+    // console.log(ventAlmacenada);
     console.log("Venta creada con exito");
     res.json(ventAlmacenada);
   } catch (error) {

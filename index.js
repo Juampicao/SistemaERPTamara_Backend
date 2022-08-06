@@ -79,3 +79,77 @@ app.listen(PORT, () => {
 // const yesterday = new Date();
 
 // yesterday.setDate(today.getDate() - 1);
+
+// const buscarProductosVendidosHoy = await Venta.find({
+//   productoVendido: {
+//     $gt: "2022-07-26T00:00:00.000Z",
+//     $lt: "2022-08-01T00:00:00.000Z",
+//   },
+// });
+// console.log(buscarPorCreatedAt);
+
+const today = new Date();
+const yesterday = new Date();
+
+yesterday.setDate(today.getDate() - 1);
+
+// const obtenerUtilidadVentasHoy = await Venta.aggregate([
+//   {
+//     $match: { fecha: { $gt: yesterday, $lt: today } },
+//   },
+
+//   {
+//     $group: {
+//       _id: "",
+//       totalVentas: { $sum: "$valorTotal" },
+//       gananciaBruta: { $sum: "$gananciaBruta" },
+//     },
+//   },
+//   {
+//     $project: {
+//       _id: 0,
+//     },
+//   },
+// ]);
+
+// console.log(obtenerUtilidadVentasHoy);
+// const nuevoArr =
+//   obtenerUtilidadVentasHoy[Object.keys(obtenerUtilidadVentasHoy)[0]];
+// console.log(nuevoArr.totalVentas);
+// console.log(nuevoArr.gananciaBruta);
+
+const ventasUnicas = await Venta.find().count();
+console.log(ventasUnicas);
+
+// const obtenerUtilidadVentasHoy = await Venta.aggregate([
+//   {
+//     $match: {
+//       $and: [{ fecha: { $gt: yesterday, $lt: today } }],
+//     },
+//   },
+//   {
+//     $group: {
+//       _id: "",
+//       totalVentas: { $sum: "$valorTotal" },
+//       gananciaBruta: { $sum: "$gananciaBruta" },
+//     },
+//   },
+//   {
+//     $project: {
+//       _id: 0,
+//     },
+//   },
+// ]);
+// [{}];
+// console.log(obtenerUtilidadVentasHoy); // OUTPUT=> [ { totalVentas: 60, gananciaBruta: 30 } ]
+// const nuevoArr =
+//   obtenerUtilidadVentasHoy[Object.keys(obtenerUtilidadVentasHoy)[0]];
+// // console.log(nuevoArr);
+
+// let UtilidadVentasHoy = 0; // Output => 60
+// let montoTotalVentasHoy = 0; // Output => 30
+
+// if (obtenerUtilidadVentasHoy.length > 0) {
+//   let UtilidadVentasHoy = nuevoArr.gananciaBruta; // Output => 60
+//   let montoTotalVentasHoy = nuevoArr.totalVentas; // Output => 30
+// }
