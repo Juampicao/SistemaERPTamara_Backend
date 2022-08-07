@@ -173,6 +173,11 @@
 // }
 // extraerValoresDeArray();
 
+// // Iterar For Each.
+// obtenerGastosPersonalizado.forEach((gasto) => {
+//   console.log(`${gasto._id} - ${gasto.valor}`);
+// });
+
 // console.log("Obtener estadisticas")
 // obtenerEstadisticas();
 // console.log("Obtener ventas")

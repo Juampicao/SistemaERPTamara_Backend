@@ -6,8 +6,13 @@ import Producto from "../models/Producto.js";
 
 const today = new Date();
 const yesterday = new Date();
-
 yesterday.setDate(today.getDate() - 1);
+
+let HastaFechaPersonalizada = new Date();
+let DesdeFechaPersonalizada;
+
+DesdeFechaPersonalizada = new Date();
+DesdeFechaPersonalizada.setDate(HastaFechaPersonalizada.getDate() - 1);
 
 const obtenerEstadisticasGenerales = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -268,7 +273,7 @@ const obtenerEstadisticasVentas = async (req, res) => {
   });
 };
 
-const obtenerEstadisticasPorFecha = async (req, res) => {
+const obtenerEstadisticasHoy = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   const { id } = req.params;
 
@@ -417,6 +422,211 @@ const obtenerEstadisticasPorFecha = async (req, res) => {
   });
 };
 
+const obtenerEstadisticasGeneralesPersonalizado = async (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  const { id } = req.params;
+
+  let fechaPersonalizada = req.body.seleccionarFechaABuscar;
+  let AyerFechaPersonalizada = req.body.seleccionarFechaABuscar;
+
+  fechaPersonalizada = new Date(req.body.seleccionarFechaABuscar);
+  AyerFechaPersonalizada = new Date();
+  AyerFechaPersonalizada.setDate(fechaPersonalizada.getDate() - 1);
+
+  console.log(` fecha personalizada es: ${fechaPersonalizada}`);
+  console.log(` Ayerfecha personalizada es: ${AyerFechaPersonalizada}`);
+
+  // Ventas Totales Personalizado
+  const obtenerUtilidadVentasPersonalizada = await Venta.aggregate([
+    {
+      $match: {
+        $and: [
+          { creador: req.usuario._id },
+          { fecha: { $gt: AyerFechaPersonalizada, $lt: fechaPersonalizada } },
+        ],
+      },
+    },
+    {
+      $group: {
+        _id: "",
+        totalVentas: { $sum: "$valorTotal" },
+        gananciaBruta: { $sum: "$gananciaBruta" },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+      },
+    },
+  ]);
+  const nuevoArr =
+    obtenerUtilidadVentasPersonalizada[
+      Object.keys(obtenerUtilidadVentasPersonalizada)[0]
+    ];
+
+  let UtilidadVentasPersonalizado = 0;
+  let montoTotalVentasPersonalizado = 0;
+
+  if (obtenerUtilidadVentasPersonalizada.length > 0) {
+    UtilidadVentasPersonalizado = nuevoArr.gananciaBruta;
+    montoTotalVentasPersonalizado = nuevoArr.totalVentas;
+  }
+
+  // Ventas Efectivo Personalizado
+  const obtenerMontoTotalVentasEfectivoPersonalizado = await Venta.aggregate([
+    {
+      $match: {
+        $and: [
+          { creador: req.usuario._id },
+          { metodoPago: "Efectivo" },
+          { fecha: { $gt: AyerFechaPersonalizada, $lt: fechaPersonalizada } },
+        ],
+      },
+    },
+
+    {
+      $group: {
+        _id: "",
+        totalVentasEfectivo: { $sum: "$valorTotal" },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+      },
+    },
+  ]);
+
+  let montoTotalVentasEfectivoPersonalizado = 0;
+  if (obtenerMontoTotalVentasEfectivoPersonalizado.length) {
+    montoTotalVentasEfectivoPersonalizado =
+      obtenerMontoTotalVentasEfectivoPersonalizado[0].totalVentasEfectivo;
+  } else {
+    montoTotalVentasEfectivoPersonalizado = 0;
+  }
+
+  // Ventas Tarjeta Personalizado
+  const obtenerMontoTotalVentasTarjetaPersonalizado = await Venta.aggregate([
+    {
+      $match: {
+        $and: [
+          { creador: req.usuario._id },
+          { metodoPago: "Tarjeta" },
+          { fecha: { $gt: AyerFechaPersonalizada, $lt: fechaPersonalizada } },
+        ],
+      },
+    },
+
+    {
+      $group: {
+        _id: "",
+        totalVentasEfectivo: { $sum: "$valorTotal" },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+      },
+    },
+  ]);
+
+  let montoTotalVentasTarjetaPersonalizado = 0;
+  if (obtenerMontoTotalVentasTarjetaPersonalizado.length) {
+    montoTotalVentasTarjetaPersonalizado =
+      obtenerMontoTotalVentasTarjetaPersonalizado[0].totalVentasEfectivo;
+  } else {
+    montoTotalVentasTarjetaPersonalizado = 0;
+  }
+
+  // Gastos Personalizado
+  const obtenerGastosTotalPersonalizado = await Gasto.aggregate([
+    {
+      $match: {
+        $and: [
+          { creador: req.usuario._id },
+          { fecha: { $gt: AyerFechaPersonalizada, $lt: fechaPersonalizada } },
+        ],
+      },
+    },
+
+    {
+      $group: {
+        _id: "",
+        totalGastos: { $sum: "$valor" },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+      },
+    },
+  ]);
+
+  let montoTotalGastosPersonalizado = 0;
+  if (obtenerGastosTotalPersonalizado.length) {
+    montoTotalGastosPersonalizado =
+      obtenerGastosTotalPersonalizado[0].totalGastos;
+  } else {
+    montoTotalGastosPersonalizado = 0;
+  }
+
+  res.json({
+    fechaPersonalizada,
+    montoTotalVentasPersonalizado,
+    UtilidadVentasPersonalizado,
+    montoTotalVentasEfectivoPersonalizado,
+    montoTotalVentasTarjetaPersonalizado,
+    montoTotalGastosPersonalizado,
+  });
+};
+
+const obtenerEstadisticasGastosPersonalizado = async (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  const { id } = req.params;
+
+  let fechaPersonalizada = req.body.seleccionarFechaABuscar;
+  let AyerFechaPersonalizada = req.body.seleccionarFechaABuscar;
+
+  fechaPersonalizada = new Date(req.body.seleccionarFechaABuscar);
+  AyerFechaPersonalizada = new Date();
+  AyerFechaPersonalizada.setDate(fechaPersonalizada.getDate() - 1);
+
+  console.log(` fecha personalizada es: ${fechaPersonalizada}`);
+  console.log(` Ayerfecha personalizada es: ${AyerFechaPersonalizada}`);
+
+  const obtenerGastosPersonalizado = await Gasto.aggregate([
+    {
+      $match: {
+        $and: [
+          { fecha: { $gt: AyerFechaPersonalizada, $lt: fechaPersonalizada } },
+        ],
+      },
+    },
+    {
+      $group: {
+        _id: "$categoria",
+        valor: { $sum: "$valor" },
+      },
+    },
+  ]);
+
+  let montoTotalGastosProveedores = [];
+  let montoTotalGastosVarios = [];
+  let montoTotalGastosComida = [];
+  let montoTotalGastosInventario = [];
+
+  obtenerGastosPersonalizado.forEach((gasto) => {
+    if ((gasto._id = "Comida")) {
+    }
+  });
+
+  console.log(obtenerGastosPersonalizado);
+
+  res.json({
+    obtenerGastosPersonalizado,
+  });
+};
+
 const obtenerEstadisticasInventario = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   const { id } = req.params;
@@ -463,94 +673,8 @@ export {
   obtenerEstadisticasGenerales,
   obtenerEstadisticasGastos,
   obtenerEstadisticasVentas,
-  obtenerEstadisticasPorFecha,
+  obtenerEstadisticasHoy,
+  obtenerEstadisticasGeneralesPersonalizado,
+  obtenerEstadisticasGastosPersonalizado,
   obtenerEstadisticasInventario,
 };
-
-// 1 Buscar por fecha
-// const buscarPorFechaActual = await Gasto.find({
-//   createdAt: {
-//     $gt: "2022-08-02T00:00:00.000Z",
-//     $lt: "2022-08-04T00:00:00.000Z",
-//   },
-// })
-//   .where("creador")
-//   .equals(req.usuario._id)
-//   .select("valor");
-// console.log(buscarPorFechaActual);
-// let resultadoInformacionFinal = [];
-// let resultadoFlat;
-// async function BuscarPorFechaReutilizable(
-//   guardarResultado,
-//   Modelo,
-//   fechaGt,
-//   fechaLt,
-//   usuario,
-//   propiedad
-// ) {
-//   const resultado = await Modelo.find({
-//     createdAt: {
-//       $gt: fechaGt,
-//       $lt: fechaLt,
-//     },
-//   })
-//     .where("creador")
-//     .equals(usuario)
-//     .select(propiedad);
-//   const guardarVariable = await guardarResultado.push(resultado);
-//   return resultado;
-// }
-// BuscarPorFechaReutilizable(
-//   resultadoInformacionFinal,
-//   Gasto,
-//   "2022-08-02T00:00:00.000Z",
-//   "2022-08-04T00:00:00.000Z",
-//   req.usuario._id,
-//   "valor"
-// );
-// const primerPasoCrearResultadoFlat = setTimeout(() => {
-//   resultadoFlat = resultadoInformacionFinal.flat(Infinity);
-//   console.log("1° Paso");
-//   console.log(resultadoFlat);
-// }, 1000);
-// // // 2 Crear Array con valores de las fechas.
-// let arrCurrentDate = [];
-// function crearArrayValores(oldArr, newArr) {
-//   for (let i = 0; i < oldArr.length; i++) {
-//     let result = oldArr[i].valor;
-//     newArr.push(result);
-//   }
-//   console.log(newArr);
-// }
-// const segundoPaso = setTimeout(() => {
-//   console.log("Paso 2°:");
-//   crearArrayValores(resultadoFlat, arrCurrentDate);
-// }, 1000);
-// // // Paso 3 sumar los valores del array.
-// let valoresCurrentDate = [];
-// function sumarNumerosArray(arr, guardarResultado) {
-//   let resultado;
-//   if (arr.length > 0) {
-//     const reducer = (accumulator, curr) => accumulator + curr;
-//     resultado = arr.reduce(reducer);
-//   } else {
-//     resultado = 0;
-//   }
-//   // console.log(resultado);
-//   guardarResultado.push(resultado);
-//   return resultado;
-// }
-// const tercerPaso = function () {
-//   sumarNumerosArray(arrCurrentDate, valoresCurrentDate);
-//   console.log(valoresCurrentDate[0]);
-// };
-// setTimeout(() => {
-//   tercerPaso();
-// }, 1000);
-// let montoTotalHoy = valoresCurrentDate[0];
-// console.log(montoTotalHoy);
-// setTimeout(() => {
-//   res.json({
-//     montoTotalHoy,
-//   });
-// }, 1500);
