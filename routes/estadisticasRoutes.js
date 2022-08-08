@@ -8,6 +8,7 @@ import {
   obtenerEstadisticasInventario,
   obtenerEstadisticasGeneralesPersonalizado,
   obtenerEstadisticasGastosPersonalizado,
+  obtenerEstadisticasMensualPersonalizado,
 } from "../controllers/estadisticasController.js";
 
 import checkAuth from "../middleware/checkAuth.js";
@@ -24,6 +25,10 @@ router
 router
   .route("/fechapersonalizada/gastos")
   .post(checkAuth, obtenerEstadisticasGastosPersonalizado);
+
+router
+  .route("/ventasmensual")
+  .post(checkAuth, obtenerEstadisticasMensualPersonalizado);
 
 router.route("/gastos").get(checkAuth, obtenerEstadisticasGastos);
 router.route("/ventas").get(checkAuth, obtenerEstadisticasVentas);

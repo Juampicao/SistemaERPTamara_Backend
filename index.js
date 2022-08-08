@@ -72,47 +72,15 @@ app.listen(PORT, () => {
   console.log("Servidor Corriendo en el puerto 4000");
 });
 
-const today = new Date();
-const yesterday = new Date();
+// const fechaHoyMundial = new Date();
+// const fechaHoyArgentina = new Date(fechaHoyMundial - 3 * 3600 * 1000);
+// console.log(fechaHoyArgentina);
 
-yesterday.setDate(today.getDate() - 1);
+let HastaFechaPersonalizada = new Date();
+let DesdeFechaPersonalizada;
 
-// const ventasUnicas = await Venta.find().count();
-// console.log(ventasUnicas);
+DesdeFechaPersonalizada = new Date(HastaFechaPersonalizada - 24 * 3600 * 1000);
+DesdeFechaPersonalizada.setDate(HastaFechaPersonalizada.getDate() - 1);
+console.log(DesdeFechaPersonalizada);
 
-let fechaPersonalizada;
-let AyerFechaPersonalizada;
-
-fechaPersonalizada = new Date();
-AyerFechaPersonalizada = new Date();
-AyerFechaPersonalizada.setDate(fechaPersonalizada.getDate() - 1);
-
-console.log(` fecha personalizada es: ${fechaPersonalizada}`);
-console.log(` Ayerfecha personalizada es: ${AyerFechaPersonalizada}`);
-
-const obtenerGastosPersonalizado = await Gasto.aggregate([
-  {
-    $match: {
-      $and: [
-        { fecha: { $gt: AyerFechaPersonalizada, $lt: fechaPersonalizada } },
-      ],
-    },
-  },
-  {
-    $group: {
-      _id: "$categoria",
-      valor: { $sum: "$valor" },
-    },
-  },
-]);
-
-let montoTotalGastosProveedores;
-let montoTotalGastosVarios;
-let montoTotalGastosComida;
-let montoTotalGastosInventario;
-
-obtenerGastosPersonalizado.forEach((gasto) => {
-  console.log(`${gasto._id} - ${gasto.valor}`);
-});
-
-console.log(obtenerGastosPersonalizado);
+// yesterday.setDate(today.getDate() - 1);

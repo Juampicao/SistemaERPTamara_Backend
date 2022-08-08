@@ -14,6 +14,9 @@ let DesdeFechaPersonalizada;
 DesdeFechaPersonalizada = new Date();
 DesdeFechaPersonalizada.setDate(HastaFechaPersonalizada.getDate() - 1);
 
+console.log(` DesdeFechaPersonalizada es: ${DesdeFechaPersonalizada}`);
+console.log(` HastaFechaPersonalizadaes: ${HastaFechaPersonalizada}`);
+
 const obtenerEstadisticasGenerales = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   const { id } = req.params;
@@ -27,8 +30,13 @@ const obtenerEstadisticasGenerales = async (req, res) => {
       },
     },
   ]);
-  const montoTotalGastos = obtenerMontoTotalGastos[0].valor;
-  console.log(montoTotalGastos);
+
+  let montoTotalGastos = 0;
+  if (obtenerMontoTotalGastos.length) {
+    montoTotalGastos = obtenerMontoTotalGastos[0].valor;
+  } else {
+    montoTotalGastos = 0;
+  }
 
   const obtenerMontoTotalVentas = await Venta.aggregate([
     { $match: { creador: req.usuario._id } },
@@ -426,15 +434,9 @@ const obtenerEstadisticasGeneralesPersonalizado = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   const { id } = req.params;
 
-  let fechaPersonalizada = req.body.seleccionarFechaABuscar;
-  let AyerFechaPersonalizada = req.body.seleccionarFechaABuscar;
-
-  fechaPersonalizada = new Date(req.body.seleccionarFechaABuscar);
-  AyerFechaPersonalizada = new Date();
-  AyerFechaPersonalizada.setDate(fechaPersonalizada.getDate() - 1);
-
-  console.log(` fecha personalizada es: ${fechaPersonalizada}`);
-  console.log(` Ayerfecha personalizada es: ${AyerFechaPersonalizada}`);
+  let HastaFechaPersonalizada = new Date(req.body.seleccionarFechaABuscar);
+  DesdeFechaPersonalizada = new Date();
+  DesdeFechaPersonalizada.setDate(HastaFechaPersonalizada.getDate() - 1);
 
   // Ventas Totales Personalizado
   const obtenerUtilidadVentasPersonalizada = await Venta.aggregate([
@@ -442,7 +444,12 @@ const obtenerEstadisticasGeneralesPersonalizado = async (req, res) => {
       $match: {
         $and: [
           { creador: req.usuario._id },
-          { fecha: { $gt: AyerFechaPersonalizada, $lt: fechaPersonalizada } },
+          {
+            fecha: {
+              $gt: DesdeFechaPersonalizada,
+              $lt: HastaFechaPersonalizada,
+            },
+          },
         ],
       },
     },
@@ -479,7 +486,12 @@ const obtenerEstadisticasGeneralesPersonalizado = async (req, res) => {
         $and: [
           { creador: req.usuario._id },
           { metodoPago: "Efectivo" },
-          { fecha: { $gt: AyerFechaPersonalizada, $lt: fechaPersonalizada } },
+          {
+            fecha: {
+              $gt: DesdeFechaPersonalizada,
+              $lt: HastaFechaPersonalizada,
+            },
+          },
         ],
       },
     },
@@ -512,7 +524,12 @@ const obtenerEstadisticasGeneralesPersonalizado = async (req, res) => {
         $and: [
           { creador: req.usuario._id },
           { metodoPago: "Tarjeta" },
-          { fecha: { $gt: AyerFechaPersonalizada, $lt: fechaPersonalizada } },
+          {
+            fecha: {
+              $gt: DesdeFechaPersonalizada,
+              $lt: HastaFechaPersonalizada,
+            },
+          },
         ],
       },
     },
@@ -544,7 +561,12 @@ const obtenerEstadisticasGeneralesPersonalizado = async (req, res) => {
       $match: {
         $and: [
           { creador: req.usuario._id },
-          { fecha: { $gt: AyerFechaPersonalizada, $lt: fechaPersonalizada } },
+          {
+            fecha: {
+              $gt: DesdeFechaPersonalizada,
+              $lt: HastaFechaPersonalizada,
+            },
+          },
         ],
       },
     },
@@ -571,7 +593,6 @@ const obtenerEstadisticasGeneralesPersonalizado = async (req, res) => {
   }
 
   res.json({
-    fechaPersonalizada,
     montoTotalVentasPersonalizado,
     UtilidadVentasPersonalizado,
     montoTotalVentasEfectivoPersonalizado,
@@ -584,21 +605,27 @@ const obtenerEstadisticasGastosPersonalizado = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   const { id } = req.params;
 
-  let fechaPersonalizada = req.body.seleccionarFechaABuscar;
-  let AyerFechaPersonalizada = req.body.seleccionarFechaABuscar;
+  let HastaFechaPersonalizada = new Date(req.body.seleccionarFechaABuscar);
+  HastaFechaPersonalizada.setDate(HastaFechaPersonalizada.getDate() + 1);
+  DesdeFechaPersonalizada = new Date();
+  DesdeFechaPersonalizada.setDate(HastaFechaPersonalizada.getDate() - 1);
 
-  fechaPersonalizada = new Date(req.body.seleccionarFechaABuscar);
-  AyerFechaPersonalizada = new Date();
-  AyerFechaPersonalizada.setDate(fechaPersonalizada.getDate() - 1);
+  console.log(` DesdeFechaPersonalizada es: ${DesdeFechaPersonalizada}`);
+  console.log(` HastaFechaPersonalizadaes: ${HastaFechaPersonalizada}`);
 
-  console.log(` fecha personalizada es: ${fechaPersonalizada}`);
-  console.log(` Ayerfecha personalizada es: ${AyerFechaPersonalizada}`);
-
-  const obtenerGastosPersonalizado = await Gasto.aggregate([
+  // Gastos Proveedor Personalizado.
+  const obtenerGastosProveedorPersonalizado = await Gasto.aggregate([
     {
       $match: {
         $and: [
-          { fecha: { $gt: AyerFechaPersonalizada, $lt: fechaPersonalizada } },
+          { creador: req.usuario._id },
+          { categoria: "Proveedor" },
+          {
+            fecha: {
+              $gt: DesdeFechaPersonalizada,
+              $lt: HastaFechaPersonalizada,
+            },
+          },
         ],
       },
     },
@@ -610,20 +637,122 @@ const obtenerEstadisticasGastosPersonalizado = async (req, res) => {
     },
   ]);
 
-  let montoTotalGastosProveedores = [];
-  let montoTotalGastosVarios = [];
-  let montoTotalGastosComida = [];
-  let montoTotalGastosInventario = [];
+  let montoTotalGastosProveedoresPersonalizado = 0;
+  if (obtenerGastosProveedorPersonalizado.length) {
+    montoTotalGastosProveedoresPersonalizado =
+      obtenerGastosProveedorPersonalizado[0].valor;
+  } else {
+    montoTotalGastosProveedoresPersonalizado = 0;
+  }
 
-  obtenerGastosPersonalizado.forEach((gasto) => {
-    if ((gasto._id = "Comida")) {
-    }
-  });
+  // Gastos Comida Personalizado.
+  const obtenerGastosComidaPersonalizado = await Gasto.aggregate([
+    {
+      $match: {
+        $and: [
+          { creador: req.usuario._id },
+          { categoria: "Comida" },
+          {
+            fecha: {
+              $gt: DesdeFechaPersonalizada,
+              $lt: HastaFechaPersonalizada,
+            },
+          },
+        ],
+      },
+    },
+    {
+      $group: {
+        _id: "$categoria",
+        valor: { $sum: "$valor" },
+      },
+    },
+  ]);
 
-  console.log(obtenerGastosPersonalizado);
+  let montoTotalGastosComidaPersonalizado = 0;
+  if (obtenerGastosComidaPersonalizado.length) {
+    montoTotalGastosComidaPersonalizado =
+      obtenerGastosComidaPersonalizado[0].valor;
+  } else {
+    montoTotalGastosComidaPersonalizado = 0;
+  }
+
+  // Gastos Varios Personalizado.
+  const obtenerGastosVariosPersonalizado = await Gasto.aggregate([
+    {
+      $match: {
+        $and: [
+          { creador: req.usuario._id },
+          { categoria: "Gastos" },
+          {
+            fecha: {
+              $gt: DesdeFechaPersonalizada,
+              $lt: HastaFechaPersonalizada,
+            },
+          },
+        ],
+      },
+    },
+    {
+      $group: {
+        _id: "$categoria",
+        valor: { $sum: "$valor" },
+      },
+    },
+  ]);
+
+  let montoTotalGastosVariosPersonalizado = 0;
+  if (obtenerGastosVariosPersonalizado.length) {
+    montoTotalGastosVariosPersonalizado =
+      obtenerGastosVariosPersonalizado[0].valor;
+  } else {
+    montoTotalGastosVariosPersonalizado = 0;
+  }
+
+  // Gastos Inventario Personalizado.
+  const obtenerGastosInventarioPersonalizado = await Gasto.aggregate([
+    {
+      $match: {
+        $and: [
+          { creador: req.usuario._id },
+          { categoria: "Inventario" },
+          {
+            fecha: {
+              $gt: DesdeFechaPersonalizada,
+              $lt: HastaFechaPersonalizada,
+            },
+          },
+        ],
+      },
+    },
+    {
+      $group: {
+        _id: "$categoria",
+        valor: { $sum: "$valor" },
+      },
+    },
+  ]);
+
+  let montoTotalGastosInventarioPersonalizado = 0;
+  if (obtenerGastosInventarioPersonalizado.length) {
+    montoTotalGastosInventarioPersonalizado =
+      obtenerGastosInventarioPersonalizado[0].valor;
+  } else {
+    montoTotalGastosInventarioPersonalizado = 0;
+  }
+
+  console.log(
+    `Desde GastosPersonalizado` + montoTotalGastosProveedoresPersonalizado,
+    montoTotalGastosComidaPersonalizado,
+    montoTotalGastosVariosPersonalizado,
+    montoTotalGastosInventarioPersonalizado
+  );
 
   res.json({
-    obtenerGastosPersonalizado,
+    montoTotalGastosProveedoresPersonalizado,
+    montoTotalGastosComidaPersonalizado,
+    montoTotalGastosVariosPersonalizado,
+    montoTotalGastosInventarioPersonalizado,
   });
 };
 
@@ -669,6 +798,41 @@ const obtenerEstadisticasInventario = async (req, res) => {
     obtenerCantidadProductosUnicos,
   });
 };
+
+const obtenerEstadisticasMensualPersonalizado = async (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  // const { id } = req.params;
+  console.log("Desde el EstadisticasMensualPersonalizado");
+
+  let HastaFechaPersonalizada = new Date(req.body.seleccionarFechaABuscar);
+  DesdeFechaPersonalizada = new Date();
+  DesdeFechaPersonalizada.setDate(HastaFechaPersonalizada.getDate() - 1);
+
+  // console.log(` DesdeFechaPersonalizada es: ${DesdeFechaPersonalizada}`);
+  // console.log(` HastaFechaPersonalizadaes: ${HastaFechaPersonalizada}`);
+
+  // Ventas Mensual Personalizado
+  const obtenerMontoTotalVentasEfectivoPorMes = await Venta.aggregate([
+    {
+      $match: {
+        $and: [{ creador: req.usuario._id }],
+      },
+    },
+    {
+      $group: {
+        _id: {
+          mes: { $month: "$fecha" },
+        },
+        totalVentasEfectivo: { $sum: "$valorTotal" },
+      },
+    },
+  ]);
+  console.log(obtenerMontoTotalVentasEfectivoPorMes);
+  res.json({
+    obtenerMontoTotalVentasEfectivoPorMes,
+  });
+};
+
 export {
   obtenerEstadisticasGenerales,
   obtenerEstadisticasGastos,
@@ -677,4 +841,5 @@ export {
   obtenerEstadisticasGeneralesPersonalizado,
   obtenerEstadisticasGastosPersonalizado,
   obtenerEstadisticasInventario,
+  obtenerEstadisticasMensualPersonalizado,
 };
